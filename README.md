@@ -84,3 +84,76 @@
 WTO COVID-19 Dashboard: https://covid19.who.int/
 
 WTO COVID-19 Data table: https://covid19.who.int/table
+
+## 基本数据文件相关信息
+
+iso_code: ISO country code，国家代码
+
+continent: 所属大洲
+
+location: 国家或地区
+
+date: 日期
+
+total_cases: 总感染病例
+
+new_cases: 新增感染病例
+
+new_cases_smoothed: 
+
+total_deaths: 总死亡病例
+
+new_deaths: 新增死亡病例
+
+new_deaths_smoothed: 降噪？**//todo**
+
+total_cases_per_million: 每100万人中的总感染病例
+
+new_cases_per_million: 每100万人中的新增感染病例
+
+new_cases_smoothed_per_million: **//todo**
+
+total_deaths_per_million: 每100万人中的总死亡病例
+
+new_deaths_per_million: 每100万人中的新增死亡病例
+
+new_deaths_smoothed_per_million: **//todo**
+
+reproduction_rate: **//todo**
+
+**//todo** 此处省略若干项
+
+stringency_index: 紧缩指数？**//todo**
+
+population: 人口总数
+
+population_density: 人口密度
+
+median_age: 年龄中位数？**//todo**
+
+aged_65_older: 65岁以上人数比例
+
+aged_70_older: 70随以上人数比例
+
+gdp_per_capita: 人均国内生产总值
+
+extreme_poverty: 极端贫穷
+
+cardiovasc_death_rate: 心血管的死亡率？**//todo**
+
+diabetes_prevalence: 糖尿病患病率
+
+female_smokers: 女性吸烟人数
+
+male_smokers: 男性吸烟人数
+
+handwashing_facilities: 洗手设施？**//todo**
+
+hospital_beds_per_thousand: 医院床位（每1000个医院）？**//todo**
+
+life_expectancy: 平均寿命
+
+human_development_index: 人类发展指数
+
+**//todo** 此处省略若干项
+
