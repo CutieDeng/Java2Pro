@@ -87,7 +87,11 @@ WTO COVID-19 Data table: https://covid19.who.int/table
 
 ## 基本数据文件相关信息
 
-iso_code: ISO country code，国家代码
+### 原始信息
+
+#### 国家基本信息
+
+iso_code: ISO country code, 国家代码
 
 continent: 所属大洲
 
@@ -95,65 +99,106 @@ location: 国家或地区
 
 date: 日期
 
-total_cases: 总感染病例
-
-new_cases: 新增感染病例
-
-new_cases_smoothed: 
-
-total_deaths: 总死亡病例
-
-new_deaths: 新增死亡病例
-
-new_deaths_smoothed: 降噪？**//todo**
-
-total_cases_per_million: 每100万人中的总感染病例
-
-new_cases_per_million: 每100万人中的新增感染病例
-
-new_cases_smoothed_per_million: **//todo**
-
-total_deaths_per_million: 每100万人中的总死亡病例
-
-new_deaths_per_million: 每100万人中的新增死亡病例
-
-new_deaths_smoothed_per_million: **//todo**
-
-reproduction_rate: **//todo**
-
-**//todo** 此处省略若干项
-
-stringency_index: 紧缩指数？**//todo**
-
-population: 人口总数
+population: 人口总数（人）
 
 population_density: 人口密度
 
+stringency_index: 财政紧缩指数
+
+life_expectancy: 平均寿命（岁）
+
 median_age: 年龄中位数？**//todo**
+
+human_development_index: 人类发展指数
 
 aged_65_older: 65岁以上人数比例
 
-aged_70_older: 70随以上人数比例
+aged_70_older: 70岁以上人数比例
 
 gdp_per_capita: 人均国内生产总值
 
 extreme_poverty: 极端贫穷
 
+handwashing_facilities: 卫生设施
+
+hospital_beds_per_thousand: 医院床位（每1000个医院）？**//todo**
+
 cardiovasc_death_rate: 心血管的死亡率？**//todo**
 
 diabetes_prevalence: 糖尿病患病率
 
-female_smokers: 女性吸烟人数
+female_smokers: 女性吸烟人数（人）
 
-male_smokers: 男性吸烟人数
+male_smokers: 男性吸烟人数（人）
 
-handwashing_facilities: 洗手设施？**//todo**
+#### 疫情相关信息
 
-hospital_beds_per_thousand: 医院床位（每1000个医院）？**//todo**
+**以下以“人”为单位：**
 
-life_expectancy: 平均寿命
+total_cases: 总感染病例
 
-human_development_index: 人类发展指数
+total_deaths: 总死亡病例
 
-**//todo** 此处省略若干项
+icu_patients: 进入 ICU 的病例数
 
+hosp_patients: 入院病例数
+
+weekly_icu_admissions: 周进入 ICU 病例数
+
+new_tests: 检测数
+
+total_vaccinations: 接种疫苗数
+
+total_boosters_per_hundred: （疫苗）加强针接种数
+
+excess_mortality_cumulative: 超额死亡累计数
+
+**以下为比例：**
+
+reproduction_rate: 基本传染数，基本再生数。
+
+Tip: 指没有任何防疫作为介入且所有人没有免疫力情况下，一个感染到某种传染病的初发个案，能够把疾病传染给其他多少个人的平均数。
+基本传染数通常写作 $R_0$ . 容易发现，该值愈大，即流行病愈难控制。
+在没有防疫情况下：
+
+- 若 $R_0 < 1$, 该传染病将逐渐消失。
+- 若 $R_0 > 1$, 该传染病会以指数方式散步，成为流行病。
+- 若 $R_0 = 1$, 传染病会变成地方性流行病
+
+positive_rate: （检测）阳性率
+
+**其他：**
+
+tests_units: 统计检测次数的单位
+
+### 附加信息
+
+**以下以“人”为单位：**
+
+new_cases: 新增感染病例
+
+new_deaths: 新增死亡病例
+
+total_cases_per_million: 每100万人中的总感染病例
+
+new_cases_per_million: 每100万人中的新增感染病例
+
+total_deaths_per_million: 每100万人中的总死亡病例
+
+new_deaths_per_million: 每100万人中的新增死亡病例
+
+excess_mortality_cumulative_absolute: 超额死亡累计数绝对值
+
+excess_mortality_cumulative_per_million: 每100万人的超额死亡累计数
+
+**以下为比例：**
+
+excess_mortality: 超额死亡率
+
+new_cases_smoothed: 
+
+new_deaths_smoothed: 降噪？**//todo**
+
+new_cases_smoothed_per_million: **//todo**
+
+new_deaths_smoothed_per_million: **//todo**
