@@ -10,6 +10,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+import java.io.File;
 
 
 public class Launch extends Application {
@@ -46,7 +47,7 @@ public class Launch extends Application {
         primaryStage.setHeight(620);
         primaryStage.setWidth(1000);
         primaryStage.setTitle("COVID-19 TRACING");
-        primaryStage.getIcons().add(new Image("/picture/icon1.png"));
+        primaryStage.getIcons().add(new Image("file:"+System.getProperty("user.dir")+"/res/picture/icon1.png"));
         primaryStage.show();
     }
 }
