@@ -1,3 +1,4 @@
+import data.Data;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -5,6 +6,7 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.stage.Stage;
+import tool.Tool;
 
 import java.io.*;
 import java.math.BigDecimal;
@@ -15,11 +17,16 @@ import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class Main extends Application{
 
     public static void main(String[] args) throws FileNotFoundException {
+        List<Data> l = Tool.readDataFile(Paths.get("res", "file", "owid-covid-data.csv").toFile());
+        l.stream().limit(20).forEach(System.out::println);
+        l.stream().map(i -> i.fetch("iso code")).forEach(System.out::println);
         System.out.println("Hello World!");
+        System.exit(0);
 //        List<Row> rows = read(Paths.get("res", "file", "owid-covid-data.csv").toFile());
 //        graph01();
     }
@@ -95,7 +102,7 @@ public class Main extends Application{
      * todo: 超过的部分将会被忽略，并记录到日志中。<br>
      * <p/>
      */
-    private static class Row{
+    private static class Row implements Data {
 
         /**
          * 静态列描述，对各列属性作出相应的解释<br>
@@ -146,6 +153,19 @@ public class Main extends Application{
                     row.length,
                     IntStream.range(0, row.length).mapToObj(i -> String.format("%s: %s", colName[i], row[i]))
                         .collect(Collectors.joining(", ")));
+        }
+
+        // IDE tips bug: any.isEmpty() doesn't exist.
+        @SuppressWarnings("SimplifyOptionalCallChains")
+        @Override
+        public String fetch(String property) {
+            String match = property.toLowerCase(Locale.ROOT).replace('_', ' ');
+            OptionalInt any = IntStream.range(0, colName.length).filter(i -> colName[i].toLowerCase(Locale.ROOT).replace('_', ' ')
+                    .equals(match)).findAny();
+            if (!any.isPresent()) {
+                return null;
+            }
+            return this.row[any.getAsInt()];
         }
     }
 
