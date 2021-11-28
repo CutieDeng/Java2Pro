@@ -1,10 +1,10 @@
 import javafx.application.Application;
-import view.TestMenu;
+import view.Launch;
 
 public class Main {
 
     public static void main(String[] args) {
-        Application.launch(TestMenu.class, args);
+        Application.launch(Launch.class, args);
     }
 
 }
