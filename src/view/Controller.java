@@ -1,5 +1,6 @@
 package view;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
@@ -40,8 +41,9 @@ public class Controller {
     private TextField searchBox;
 
     @FXML
-    void pressEnter(KeyEvent event) {
-        if (event.getCode().name().equals("ENTER")) {
+    void pressEnter(ActionEvent event) {
+        KeyEvent keyEvent = (KeyEvent) event.getSource();
+        if (keyEvent.getCode().name().equals("ENTER")) {
             //todo
         }
     }
