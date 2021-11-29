@@ -202,3 +202,74 @@ new_deaths_smoothed: 降噪？**//todo**
 new_cases_smoothed_per_million: **//todo**
 
 new_deaths_smoothed_per_million: **//todo**
+
+## 注释规范
+
+在代码中，使用 *JavaDoc* 注释应遵循如下的规范：
+
+- 使用 `/**` 开头，以显式描述该类、方法、成员变量的作用，注释应当写在其解释的对象之前。
+- 注释过程中，一般的断句不应该出现换行。任何显示的换行操作前先写下如下代码 `<br>`, 以让支持 html 渲染的设备能够意识到这里进行了显示的换行声明。
+- 通过 `<p>` 进行分段，笔者建议在段落结束时直接增加一段 `<p/>` 进行分段。
+- 注释的内容应当有一定的层次感，目前大致建议分成两部分，一部分是对象注释头部，概述该对象的用处；后一部分是对该对象用法的详细解释，建议对于具体的方法有足够详细的描述，以便于让调用者知道该方法的用处和（如果有的话）副作用。可以通过 `<blockquote> ... </blockquote>` 增加代码样例以便于使用者增进理解，和增加字数。
+- 通过 `{@link package.class(#method/member variable)}` 能够创建一个指向其他类、方法、属性的超链接，以便于调用者增进理解。
+- `@see` 注解能够在注释的尾部增加一段参考说明，语义大概同一篇论文的参考文章条目。
+- `@deprecated` 表示该方法不推荐使用，将在未来弃用。（这实际上是一种对过去作出承诺的背弃，请不要轻易做出这个决定。）
+
+以下是关于枚举类 `Continent` 的注释，仅供参考：
+
+```java
+/**
+ * 七大洲<br>
+ * <p/>
+ *
+ * 一个包含了七大洲（亚洲、欧洲...）的枚举类。<br>
+ * <p/>
+ *
+ * 调用 {@link Continent#valueOf(String)} 能够直接获得相应的枚举实例。<br>
+ * 例如：<br>
+ * <blockquote>
+ *     Continent africa = Continent.valueOf("AFRICA");
+ * </blockquote>
+ * <p/>
+ *
+ * 调用该方法需要传递相关的对应的枚举实例全名，而不是缺省值、或者其他语言下的翻译。<br>
+ * 如果尝试写出以下代码：<br>
+ * <blockquote>
+ *     Continent 亚洲 = Continent.valueOf("亚洲");
+ * </blockquote>
+ * 则会得到一个参数不合法的异常回馈：{@link IllegalArgumentException}.
+ * <p/>
+ *
+ * 在 tool 包中提供了一个特殊的解释器实例 {@link tool.Explainer}, 它将提供重载的解释方法 {@link tool.Explainer#getName(Continent)} 用户获取对应语言下的实例解释。<br>
+ * <p/>
+ *
+ * @see tool.Explainer
+ */
+```
+
+
+
+---
+
+*Fri Nov 26 21:57:20 CST 2021*
+
+新增三个特殊的关键字（identifier）对方法进行描述：**构造器**，**更改器**，**访问器**。
+
+- **更改器**方法：该方法将会直接、间接更改其对象的内部信息或行为。
+- **访问器**方法：该方法不会更改调用对象的任何信息。
+- **构造器**方法：对于不可变对象而言，通过构造一个新的对象来传达「改变」 的信息。
+
+### 接口规范
+
+---
+
+*Sun Nov 28 21:40:21 CST 2021*
+
+添加了一个特殊的数据对象 `data.Data`. 
+
+- 类 `data.Data` 提供了关键字如下的唯一接口：`String fetch(String property)`. 
+  具体约定如下：
+  - 输入与列名相同的 property 以便获取对象实例的具体属性值。出于方便起见，匹配过程中模糊大小写和下划线/空格符的区别。
+  - 如果该对象不存在对应的属性，则返回 `null`, 否则不会返回 `null`. 
+- 新增了工具类 `tool.Tool`, 提供了获取文件中 Data 的方法 `List<data.Data> readDataFile(java.io.File file)` 获取文件中所有的数据并汇总成列表。
+
