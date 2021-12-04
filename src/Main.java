@@ -7,6 +7,7 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.stage.Stage;
 import tool.Tool;
+import view.Launch;
 
 import java.io.*;
 import java.math.BigDecimal;
@@ -26,6 +27,7 @@ public class Main extends Application{
         l.stream().limit(20).forEach(System.out::println);
         l.stream().map(i -> i.fetch("iso code")).forEach(System.out::println);
         System.out.println("Hello World!");
+        launch(Launch.class, args);
         System.exit(0);
 //        List<Row> rows = read(Paths.get("res", "file", "owid-covid-data.csv").toFile());
 //        graph01();
