@@ -1,13 +1,9 @@
 package view;
 
-import com.sun.istack.internal.NotNull;
-import com.sun.org.apache.bcel.internal.classfile.Code;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-
-import java.util.Date;
 
 /**
  * 以TableRow存入的数据是已经处理好了的数据，<br>
@@ -18,11 +14,11 @@ import java.util.Date;
 
 
 public class TableRow {
-    private StringProperty isoCode;
-    private StringProperty date;
-    private IntegerProperty totalCases;
-    private IntegerProperty newCases;
-    private IntegerProperty totalDeaths;
+    private final StringProperty isoCode = new SimpleStringProperty();
+    private final StringProperty date = new SimpleStringProperty();
+    private final IntegerProperty totalCases = new SimpleIntegerProperty();
+    private final IntegerProperty newCases = new SimpleIntegerProperty();
+    private final IntegerProperty totalDeaths = new SimpleIntegerProperty();
 
     public TableRow(String isoCode, String date, Integer totalCases,
                     Integer newCases, Integer totalDeaths) {
@@ -42,9 +38,6 @@ public class TableRow {
     }
 
     public void setIsoCode(String isoCode) {
-        if (this.isoCode == null) {
-            this.isoCode = new SimpleStringProperty(this, isoCode);
-        }
         this.isoCode.set(isoCode);
     }
 
@@ -57,9 +50,6 @@ public class TableRow {
     }
 
     public void setDate(String date) {
-        if (this.date == null) {
-            this.date = new SimpleStringProperty(this, date);
-        }
         this.date.set(date);
     }
 
@@ -72,9 +62,6 @@ public class TableRow {
     }
 
     public void setTotalCases(Integer totalCases) {
-        if (this.totalCases == null) {
-            this.totalCases = new SimpleIntegerProperty(this, totalCases.toString());
-        }
         this.totalCases.set(totalCases);
     }
 
@@ -87,9 +74,6 @@ public class TableRow {
     }
 
     public void setNewCases(Integer newCases) {
-        if (this.newCases == null) {
-            this.newCases = new SimpleIntegerProperty(this, newCases.toString());
-        }
         this.newCases.set(newCases);
     }
 
@@ -102,9 +86,6 @@ public class TableRow {
     }
 
     public void setTotalDeaths(Integer totalDeaths) {
-        if (this.totalDeaths == null) {
-            this.totalDeaths = new SimpleIntegerProperty(this, totalDeaths.toString());
-        }
         this.totalDeaths.set(totalDeaths);
     }
 }
