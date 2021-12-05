@@ -5,6 +5,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.chart.BarChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
@@ -14,7 +15,6 @@ import javafx.scene.layout.BorderPane;
 import tool.Tool;
 
 import java.nio.file.Paths;
-import java.util.Date;
 import java.util.List;
 
 public class Controller {
@@ -53,13 +53,13 @@ public class Controller {
     private TableView<TableRow> table;
 
     @FXML
-    private TableColumn<TableRow, String> newCasesCol;
+    private TableColumn<TableRow, Integer> newCasesCol;
 
     @FXML
     private TableColumn<TableRow, Integer> totalCasesCol;
 
     @FXML
-    private TableColumn<TableRow, String> totalDeathsCol;
+    private TableColumn<TableRow, Integer> totalDeathsCol;
 
     @FXML
     private TableColumn<TableRow, String> dateCol;
@@ -70,14 +70,20 @@ public class Controller {
     private ObservableList<TableRow> tableData = FXCollections.observableArrayList();
 
     @FXML
+    private MenuItem graph1;
+
+    @FXML
+    private MenuItem graph2;
+
+
+    @FXML
     private void initialize(){
 
-        //todo:这里映射搞不太懂
-        isoCodeCol.setCellValueFactory(new PropertyValueFactory("isoCode"));
-        dateCol.setCellValueFactory(new PropertyValueFactory("date"));
-        totalCasesCol.setCellValueFactory(new PropertyValueFactory("totalCases"));
-        newCasesCol.setCellValueFactory(new PropertyValueFactory("newCases"));
-        totalDeathsCol.setCellValueFactory(new PropertyValueFactory("totalDeaths"));
+        isoCodeCol.setCellValueFactory(new PropertyValueFactory<>("isoCode"));
+        dateCol.setCellValueFactory(new PropertyValueFactory<>("date"));
+        totalCasesCol.setCellValueFactory(new PropertyValueFactory<>("totalCases"));
+        newCasesCol.setCellValueFactory(new PropertyValueFactory<>("newCases"));
+        totalDeathsCol.setCellValueFactory(new PropertyValueFactory<>("totalDeaths"));
 
         //绑定数据到TableView
         table.setItems(tableData);
@@ -89,18 +95,38 @@ public class Controller {
         data.stream().map(TableRow::new).forEach(tableData::add);
     }
 
+    @FXML
+    void clickGraph1(ActionEvent event) {
+        /*AnchorPane graphAnchorPane = new AnchorPane();
+        root.setCenter(graphAnchorPane);*/
+
+
+    }
+
+    @FXML
+    void clickGraph2(ActionEvent event) {
+    }
+
 
     @FXML
     void pressEnter(ActionEvent event) {
-        KeyEvent keyEvent = (KeyEvent) event.getSource();
+        /*KeyEvent keyEvent = (KeyEvent) event.getSource();
         if (keyEvent.getCode().name().equals("ENTER")) {
             //todo
-        }
+        }*/
     }
 
     @FXML
     void clickGo(MouseEvent event) {
-        //todo
+        String searchText = searchBox.getText();
+        ObservableList<TableRow> searchData = FXCollections.observableArrayList();
+        List<Data> data = Tool.readDataFile(Paths.get("res", "file", "owid-covid-data.csv").toFile());
+        data.stream()
+                .filter(d -> d.fetch("iso code").equals(searchText))
+                .map(TableRow::new).forEach(searchData::add);
+
+        table.setItems(searchData);
+
     }
 
 }

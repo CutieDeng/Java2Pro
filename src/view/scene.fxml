@@ -21,8 +21,8 @@
             </Button>
             <MenuButton fx:id="menuButton" layoutX="50.0" layoutY="100.0" mnemonicParsing="false" prefHeight="36.0" prefWidth="100.0" text="Menu">
                <items>
-                  <MenuItem mnemonicParsing="false" text="Action 1" />
-                  <MenuItem mnemonicParsing="false" text="Action 2" />
+                  <MenuItem fx:id="graph1" mnemonicParsing="false" onAction="#clickGraph1" text="Graph1" />
+                  <MenuItem fx:id="graph2" mnemonicParsing="false" onAction="#clickGraph2" text="Graph2" />
                </items>
             </MenuButton>
          </children>
@@ -31,13 +31,13 @@
    <center>
       <AnchorPane fx:id="mainView" prefHeight="620.0" prefWidth="800.0" BorderPane.alignment="CENTER">
          <children>
-            <TableView fx:id="table" layoutX="148.0" layoutY="33.0" prefHeight="500.0" prefWidth="560.0">
+            <TableView fx:id="table" layoutX="149.0" layoutY="14.0" prefHeight="500.0" prefWidth="501.1">
               <columns>
                 <TableColumn fx:id="isoCodeCol" maxWidth="60.0" minWidth="60.0" prefWidth="60.0" text="ISO" />
-                <TableColumn fx:id="dateCol" maxWidth="150.0" minWidth="120.0" prefWidth="140.0" text="Date" />
-                  <TableColumn fx:id="totalCasesCol" maxWidth="140.0" minWidth="100.0" prefWidth="120.0" text="Total Cases" />
+                <TableColumn fx:id="dateCol" maxWidth="110.0" minWidth="100.0" prefWidth="100.0" text="Date" />
+                  <TableColumn fx:id="totalCasesCol" maxWidth="110.0" minWidth="100.0" prefWidth="110.0" text="Total Cases" />
                   <TableColumn fx:id="newCasesCol" maxWidth="110.0" minWidth="100.0" prefWidth="110.0" text="New Cases" />
-                  <TableColumn fx:id="totalDeathsCol" maxWidth="130.0" minWidth="110.0" prefWidth="130.0" text="Total Deaths" />
+                  <TableColumn fx:id="totalDeathsCol" maxWidth="130.0" minWidth="110.0" prefWidth="120.0" text="Total Deaths" />
               </columns>
             </TableView>
          </children></AnchorPane>
