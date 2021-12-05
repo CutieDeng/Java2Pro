@@ -97,6 +97,9 @@ public class Launch extends Application {
             data.stream()
                     .filter(d -> d.fetch("iso code").equals(searchText))
                     .map(TableRow::new).forEach(searchData::add);
+            data.stream()
+                    .filter(d -> d.fetch("date").equals(searchText))
+                    .map(TableRow::new).forEach(searchData::add);
 
             table.setItems(searchData);
         };
