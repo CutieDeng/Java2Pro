@@ -17,7 +17,7 @@ public final class Tool {
             readMethod.setAccessible(true);
             List<Data> result = (List<Data>) readMethod.invoke(main, file);
             readMethod.setAccessible(false);
-            return result;
+            return result.subList(0, 100);
         } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException | ClassNotFoundException e) {
             e.printStackTrace();
         }
