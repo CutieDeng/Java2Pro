@@ -1,5 +1,6 @@
 package view;
 
+import data.Data;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -10,8 +11,11 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import tool.Tool;
 
+import java.nio.file.Paths;
 import java.util.Date;
+import java.util.List;
 
 public class Controller {
 
@@ -80,7 +84,9 @@ public class Controller {
 
         //todo 这里加数据
         //添加数据到tableData，TableView会自动更新
-        tableData.add(new TableRow("EFO", "2021-11-1", 2330, 234, 123));
+//        tableData.add(new TableRow("EFO", "2021-11-1", 2330, 234, 123));
+        List<Data> data = Tool.readDataFile(Paths.get("res", "file", "owid-covid-data.csv").toFile());
+        data.stream().map(TableRow::new).forEach(tableData::add);
     }
 
 
