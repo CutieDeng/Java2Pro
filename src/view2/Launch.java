@@ -4,10 +4,7 @@ import data.Data;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.event.Event;
-import javafx.event.EventHandler;
-import javafx.event.EventType;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -71,8 +68,8 @@ public class Launch extends Application {
 
         ObservableList<TableRow> tableData = FXCollections.observableArrayList();
         table.setItems(tableData);
-        List<Data> someData = Tool.readDataFile(Paths.get("res", "file", "owid-covid-data.csv").toFile());
-        someData.stream().map(TableRow::new).forEach(tableData::add);
+        List<Data> allData = Tool.readDataFile(Paths.get("res", "file", "owid-covid-data.csv").toFile());
+        allData.stream().map(TableRow::new).forEach(tableData::add);
 
 
         TextField searchBox = new TextField();
@@ -105,11 +102,12 @@ public class Launch extends Application {
         };
 
         searchButton.addEventHandler(MouseEvent.MOUSE_CLICKED, doSearch::accept);
-        searchButton.setOnKeyPressed(event -> {
+        searchBox.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 doSearch.accept(event);
             }
         });
+
 
         MenuBar menuBar = new MenuBar();
         menuBar.setPrefHeight(20);
