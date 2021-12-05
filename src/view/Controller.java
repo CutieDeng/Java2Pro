@@ -107,7 +107,6 @@ public class Controller {
     void clickGraph2(ActionEvent event) {
     }
 
-
     @FXML
     void pressEnter(ActionEvent event) {
         /*KeyEvent keyEvent = (KeyEvent) event.getSource();
