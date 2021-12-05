@@ -7,7 +7,7 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.stage.Stage;
 import tool.Tool;
-import view.Launch;
+import view2.Launch;
 
 import java.io.*;
 import java.math.BigDecimal;

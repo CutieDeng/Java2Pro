@@ -1,68 +1,35 @@
 package view2;
 
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.application.Application;
-import javafx.scene.Group;
+import javafx.event.EventType;
 import javafx.scene.Scene;
-import javafx.scene.chart.BarChart;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import javafx.util.Duration;
-
-import java.util.Random;
 
 public class Launch extends Application {
-
-    public static void main(String[] args) {
-        Application.launch(args);
-    }
-
     @Override
     public void start(Stage primaryStage) throws Exception {
-        primaryStage.setScene(new Scene(new Group()));
-        primaryStage.getScene().getRoot().setVisible(true);
+        BorderPane root = new BorderPane();
+        root.setPrefWidth(1000);
+        root.setPrefHeight(800);
+        root.setStyle("-fx-background-color: #FF9900;");
 
-        {
-            final NumberAxis marks = new NumberAxis();
-            marks.setLabel("GPA");
-            final CategoryAxis peopleNames = new CategoryAxis();
-            peopleNames.setLabel("姓名");
-            final BarChart<String, Number> chart = new BarChart<>(peopleNames, marks);
-            chart.setTitle("GPA - 姓名 分布图");
+        //全屏/窗口模式切换
+        primaryStage.addEventHandler(KeyEvent.KEY_RELEASED,e -> {
+            if (e.getCode() == KeyCode.F11)
+                primaryStage.setFullScreen(!primaryStage.isFullScreen());
+        });
+        primaryStage.setFullScreenExitHint("按 F11 切换全屏/窗口模式");
+        primaryStage.setFullScreen(true);
 
-            XYChart.Series<String, Number> s = new XYChart.Series<>();
-            final Random random = new Random(47);
-
-            chart.getData().addAll(s);
-
-            final int[] cnt = new int[] {0};
-            String[] names = new String[30];
-
-
-            Timeline timeline = new Timeline();
-            timeline.getKeyFrames().add(new KeyFrame(Duration.millis(1000),
-                    action -> {
-                    if (cnt[0] < 30) {
-                        names[cnt[0]] =
-                                random.ints().map(i -> i % 26).limit(4)
-                                        .map(i -> (char)(i + 'a'))
-                                        .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString();
-                        float tmp = random.nextFloat() * 4;
-                        s.getData().add(new XYChart.Data<>(names[cnt[0]], tmp));
-                        cnt[0]++;
-                    }
-                    }));
-            timeline.setCycleCount(30);
-
-            AnchorPane pane = new AnchorPane(chart);
-            primaryStage.setScene(new Scene(pane));
-
-            timeline.play();
-        }
+        primaryStage.setScene(new Scene(root));
+        primaryStage.setHeight(620);
+        primaryStage.setWidth(1050);
+        primaryStage.setTitle("COVID-19 TRACING");
+        primaryStage.getIcons().add(new Image("file:"+System.getProperty("user.dir")+"/res/picture/icon1.png"));
         primaryStage.show();
     }
 }
