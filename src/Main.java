@@ -265,8 +265,8 @@ public class Main extends Application{
         }
         try (BufferedReader input = new BufferedReader(new InputStreamReader(new FileInputStream(file)))) {
             Row.initColName(input.readLine());
-            return input.lines().filter(Objects::nonNull).limit(2000)
-                    .map(Row::new).collect(Collectors.toList());
+            return input.lines().filter(Objects::nonNull)
+                    .map(Row::new).filter(r -> r.fetch("date").matches("2020-0[1-6]-\\d{2}")).collect(Collectors.toList());
         } catch (IOException e) {
             logger.severe(e.getMessage());
             return null;

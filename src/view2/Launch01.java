@@ -22,7 +22,7 @@ public class Launch01 extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         primaryStage.setScene(new Scene(new Group()));
         primaryStage.getScene().getRoot().setVisible(true);
 
@@ -37,6 +37,7 @@ public class Launch01 extends Application {
             XYChart.Series<String, Number> s = new XYChart.Series<>();
             final Random random = new Random(47);
 
+            //noinspection unchecked
             chart.getData().addAll(s);
 
             final int[] cnt = new int[] {0};
