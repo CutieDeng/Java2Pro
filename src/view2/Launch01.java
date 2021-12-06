@@ -10,6 +10,7 @@ import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -24,7 +25,7 @@ public class Launch01 extends Application {
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setScene(new Scene(new Group()));
-        primaryStage.getScene().getRoot().setVisible(true);
+//        primaryStage.getScene().getRoot().setVisible(true);
 
         {
             final NumberAxis marks = new NumberAxis();
@@ -43,14 +44,13 @@ public class Launch01 extends Application {
             final int[] cnt = new int[] {0};
             String[] names = new String[30];
 
-
             Timeline timeline = new Timeline();
-            timeline.getKeyFrames().add(new KeyFrame(Duration.millis(1000),
+            timeline.getKeyFrames().add(new KeyFrame(Duration.millis(2000),
                     action -> {
                     if (cnt[0] < 30) {
                         names[cnt[0]] =
                                 random.ints().map(i -> i % 26).limit(4)
-                                        .map(i -> (char)(i + 'a'))
+                                        .mapToObj(i -> (char)(i + 'a'))
                                         .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString();
                         float tmp = random.nextFloat() * 4;
                         s.getData().add(new XYChart.Data<>(names[cnt[0]], tmp));
@@ -59,7 +59,7 @@ public class Launch01 extends Application {
                     }));
             timeline.setCycleCount(30);
 
-            AnchorPane pane = new AnchorPane(chart);
+            BorderPane pane = new BorderPane(chart);
             primaryStage.setScene(new Scene(pane));
 
             timeline.play();

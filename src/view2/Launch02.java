@@ -27,7 +27,7 @@ public class Launch02 extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         AnchorPane pane = new AnchorPane();
         EnclosedObject<KeyFrame> frame = new EnclosedObject<>();
         pane.getChildren().add(method2("total cases",
@@ -72,7 +72,7 @@ public class Launch02 extends Application {
                 ArrayList<Data> data = timeStamp.get(i.next());
                 data.stream().forEach(d -> {
                     if (!countryMap.containsKey(d.fetch("iso code"))) {
-                        Series nS = new Series();
+                        Series<String, Number> nS = new Series<>();
                         nS.setName(d.fetch("iso code"));
                         timingChart.getData().add(nS);
                         countryMap.put(d.fetch("iso code"), nS);
