@@ -34,7 +34,9 @@ public final class Tool {
         Field colName = null;
         try {
             colName = row.getDeclaredField("colName");
+                colName.setAccessible(true);
             cols.obj = (Arrays.asList((String[]) colName.get(row)));
+            colName.setAccessible(false);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             Logger.getAnonymousLogger().warning(e.getLocalizedMessage());
         }
