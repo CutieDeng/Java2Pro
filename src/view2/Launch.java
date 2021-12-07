@@ -4,7 +4,11 @@ import data.Data;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.Event;
+import javafx.event.EventHandler;
+import javafx.event.EventType;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -12,8 +16,8 @@ import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import tool.Tool;
 import util.Holder;
@@ -34,15 +38,34 @@ public class Launch extends Application {
         root.setPrefHeight(800);
         root.setStyle("-fx-background-color: #FF9900;");
 
+        TabPane tabPane = new TabPane();
+        root.setCenter(tabPane);
+
+        Tab origin = new Tab("Table");
+        tabPane.getTabs().add(origin);
+
+        BorderPane tablePane = new BorderPane();
+        origin.setContent(tablePane);
 
         AnchorPane searchPane = new AnchorPane();
         searchPane.setPrefWidth(200);
         searchPane.setStyle("-fx-background-color: #CCFF99;");
-        root.setRight(searchPane);
+        tablePane.setRight(searchPane);
 
         AnchorPane tableView = new AnchorPane();
         tableView.setPrefWidth(800);
-        root.setCenter(tableView);
+        tablePane.setCenter(tableView);
+
+        VBox tipView = new VBox();
+        tipView.setPadding(new Insets(5));
+        tipView.setBorder(new Border(new BorderStroke(Color.LIGHTGREY, BorderStrokeStyle.SOLID,
+                new CornerRadii(0), new BorderWidths(2))));
+        tipView.setStyle("-fx-background-color:#CCFFFF");
+        root.setBottom(tipView);
+
+        Label message = new Label("empty");
+        tipView.getChildren().add(message);
+
 
         TableView<TableRow> table = new TableView<>();
         table.setLayoutX(148);
@@ -85,7 +108,7 @@ public class Launch extends Application {
         };
 
         Holder<List<String>> holder = new Holder<>();
-        List<Data> test = Tool.readDataFile(Paths.get("res", "file", "owid-covid-data.csv").toFile(), holder);
+        Tool.readDataFile(Paths.get("res", "file", "owid-covid-data.csv").toFile(), holder);
         for (String s : holder.obj) {
             System.out.println(s);
         }
@@ -145,11 +168,31 @@ public class Launch extends Application {
 
         Menu menuFile = new Menu("File");
         Menu menuData = new Menu("Data");
-        menuBar.getMenus().addAll(menuFile, menuData);
+        Menu addPage = new Menu("+");
+        menuBar.getMenus().addAll(menuFile, menuData, addPage);
+
+        addPage.setOnAction(event -> {
+            System.out.println("test");
+            Tab newPage = new Tab("New Page");
+            tabPane.getTabs().add(newPage);
+        });
 
         MenuItem tableMenu = new MenuItem("Table");
         menuData.getItems().add(tableMenu);
-        tableMenu.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> root.setCenter(tableView));
+
+
+        MenuItem graphMenu = new MenuItem("Graph");
+        menuData.getItems().add(graphMenu);
+
+
+
+        graphMenu.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                System.out.println("hao");
+            }
+        });
+
 
 
 
@@ -162,7 +205,7 @@ public class Launch extends Application {
         primaryStage.setFullScreen(true);
 
         primaryStage.setScene(new Scene(root));
-        primaryStage.setHeight(620);
+        primaryStage.setHeight(630);
         primaryStage.setWidth(1050);
         primaryStage.setTitle("COVID-19 TRACING");
         primaryStage.getIcons().add(new Image("file:"+System.getProperty("user.dir")+"/res/picture/icon1.png"));
