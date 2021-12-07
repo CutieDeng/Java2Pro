@@ -16,14 +16,11 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import tool.Tool;
-import util.Holder;
 import view.TableRow;
 
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.ToIntFunction;
 
 
 public class Launch extends Application {
@@ -40,9 +37,9 @@ public class Launch extends Application {
         searchPane.setStyle("-fx-background-color: #CCFF99;");
         root.setRight(searchPane);
 
-        AnchorPane tableView = new AnchorPane();
-        tableView.setPrefWidth(800);
-        root.setCenter(tableView);
+        AnchorPane mainView = new AnchorPane();
+        mainView.setPrefWidth(800);
+        root.setCenter(mainView);
 
         TableView<TableRow> table = new TableView<>();
         table.setLayoutX(148);
@@ -50,47 +47,24 @@ public class Launch extends Application {
         table.setPrefHeight(500);
         table.setPrefWidth(560);
         table.setTableMenuButtonVisible(true);
-        tableView.getChildren().add(table);
+        mainView.getChildren().add(table);
 
-        //根据列名初始化列
-        final ToIntFunction<String> widthSupplier = str -> 80;
-        Function<String, TableColumn<TableRow, String>> normalColGenerator =
-                s -> {
-            final TableColumn<TableRow, String> col = new TableColumn<>(s);
-            col.setCellValueFactory(new PropertyValueFactory<>(s));
-            col.setPrefWidth(widthSupplier.applyAsInt(s));
-            return col;
-        };
-
-        final Function<String, String> strMap = s -> {
-            char[] cs = s.toCharArray();
-            StringBuilder builder = new StringBuilder();
-            boolean flag = false;
-            for (char c : cs) {
-                if (c == '_') {
-                    flag = true;
-                    continue;
-                }
-                if (!flag) {
-                    builder.append(c);
-                } else {
-                    if (c >= 'a' && c <= 'z')
-                        builder.append((char)(c + 'A' - 'a'));
-                    else
-                        builder.append(c);
-                }
-                flag = false;
-            }
-            return builder.toString();
-        };
-
-        Holder<List<String>> holder = new Holder<>();
-        List<Data> test = Tool.readDataFile(Paths.get("res", "file", "owid-covid-data.csv").toFile(), holder);
-        for (String s : holder.obj) {
-            System.out.println(s);
-        }
-        holder.obj.forEach(s -> table.getColumns().add(strMap.andThen(normalColGenerator).apply(s)));
-
+        TableColumn<TableRow, String> isoCodeCol = new TableColumn<>("ISO");
+        isoCodeCol.setCellValueFactory(new PropertyValueFactory<>("isoCode"));
+        isoCodeCol.setPrefWidth(60);
+        TableColumn<TableRow, String> dateCol = new TableColumn<>("Date");
+        dateCol.setCellValueFactory(new PropertyValueFactory<>("date"));
+        dateCol.setPrefWidth(140);
+        TableColumn<TableRow, Integer> totalCasesCol = new TableColumn<>("Total Cases");
+        totalCasesCol.setCellValueFactory(new PropertyValueFactory<>("totalCases"));
+        totalCasesCol.setPrefWidth(120);
+        TableColumn<TableRow, Integer> newCasesCol = new TableColumn<>("New Cases");
+        newCasesCol.setCellValueFactory(new PropertyValueFactory<>("newCases"));
+        newCasesCol.setPrefWidth(110);
+        TableColumn<TableRow, Integer> totalDeathsCol = new TableColumn<>("Total Deaths");
+        totalDeathsCol.setCellValueFactory(new PropertyValueFactory<>("totalDeaths"));
+        totalDeathsCol.setPrefWidth(130);
+        table.getColumns().addAll(isoCodeCol, dateCol, totalCasesCol, newCasesCol, totalDeathsCol);
 
         ObservableList<TableRow> tableData = FXCollections.observableArrayList();
         table.setItems(tableData);
@@ -144,17 +118,17 @@ public class Launch extends Application {
         root.setTop(menuBar);
 
         Menu menuFile = new Menu("File");
-        Menu menuData = new Menu("Data");
-        menuBar.getMenus().addAll(menuFile, menuData);
+        Menu menuEdit = new Menu("Edit");
+        menuBar.getMenus().addAll(menuFile, menuEdit);
 
-        MenuItem tableMenu = new MenuItem("Table");
-        menuData.getItems().add(tableMenu);
-        tableMenu.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> root.setCenter(tableView));
+        MenuItem item1 = new MenuItem("12");
+        menuFile.getItems().add(item1);
+
 
 
 
         //全屏/窗口模式切换
-        primaryStage.addEventHandler(KeyEvent.KEY_RELEASED, e -> {
+        primaryStage.addEventHandler(KeyEvent.KEY_RELEASED,e -> {
             if (e.getCode() == KeyCode.F11)
                 primaryStage.setFullScreen(!primaryStage.isFullScreen());
         });

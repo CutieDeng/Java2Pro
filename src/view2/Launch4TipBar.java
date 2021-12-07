@@ -6,14 +6,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.effect.Blend;
-import javafx.scene.effect.Effect;
-import javafx.scene.effect.Glow;
+import javafx.scene.effect.BlurType;
+import javafx.scene.effect.Shadow;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Box;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.util.function.Consumer;
@@ -36,11 +33,11 @@ public class Launch4TipBar extends Application {
             mainPane.setPrefSize(800, 600);
             VBox box = new VBox();
             box.setPadding(new Insets(10));
-            box.setSpacing(15);
             box.setFillWidth(true);
+            box.setBackground(new Background(new BackgroundFill(Color.LIGHTBLUE, new CornerRadii(15), new Insets(2))));
             box.setBorder(new Border(new BorderStroke(Color.LIGHTGREY, BorderStrokeStyle.SOLID,
                     new CornerRadii(15),new BorderWidths(2))));
-//            box.setEffect(new Blend());
+//            box.setEffect(new Shadow(BlurType.GAUSSIAN, Color.LIGHTCYAN, 2));
             Label message = new Label("empty");
             setString = message::setText;
 
