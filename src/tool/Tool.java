@@ -24,6 +24,7 @@ public final class Tool {
             Class<?> main = Class.forName("Main");
             Method readMethod = main.getDeclaredMethod("read", File.class);
             readMethod.setAccessible(true);
+            //noinspection unchecked
             result = (List<Data>) readMethod.invoke(main, file);
             readMethod.setAccessible(false);
         } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException | ClassNotFoundException e) {
