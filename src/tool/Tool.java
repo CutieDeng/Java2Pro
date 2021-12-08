@@ -15,32 +15,31 @@ import java.util.logging.Logger;
 public final class Tool {
 
     public static List<Data> readDataFile(File file) {
+        return readDataFile(file, new Holder<>());
+    }
+
+    public static List<Data> readDataFile(File file, Holder<List<String>> cols) {
+        List<Data> result = null;
         try {
             Class<?> main = Class.forName("Main");
             Method readMethod = main.getDeclaredMethod("read", File.class);
             readMethod.setAccessible(true);
-            List<Data> result = (List<Data>) readMethod.invoke(main, file);
+            result = (List<Data>) readMethod.invoke(main, file);
             readMethod.setAccessible(false);
-            return result;
         } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException | ClassNotFoundException e) {
             e.printStackTrace();
+            result = new ArrayList<>();
         }
-        return new ArrayList<>();
-    }
-
-    public static List<Data> readDataFile(File file, Holder<List<String>> cols) {
-        List<Data> r = readDataFile(file);
-        Class<? extends Data> row = r.get(0).getClass();
-        Field colName = null;
+        Class<? extends Data> row = result.get(0).getClass();
         try {
-            colName = row.getDeclaredField("colName");
-                colName.setAccessible(true);
+            Field colName = row.getDeclaredField("colName");
+            colName.setAccessible(true);
             cols.obj = (Arrays.asList((String[]) colName.get(row)));
             colName.setAccessible(false);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             Logger.getAnonymousLogger().warning(e.getLocalizedMessage());
         }
-        return r;
+        return result;
     }
 
 }
