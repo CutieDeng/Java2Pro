@@ -4,7 +4,6 @@ import data.Data;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -23,7 +22,10 @@ import view.TableRow;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
-import java.util.function.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.IntSupplier;
+import java.util.function.ToIntFunction;
 
 
 public class Launch extends Application {
@@ -69,13 +71,21 @@ public class Launch extends Application {
         // 提示框内容设置
         final Label message = new Label("");
         tipBox.getChildren().add(message);
+
         // 将对提示框的内容设置方法上传到全局信息，便于其他方法进行调用。
-        tipNotify = message::setText;
+        // 补充：新增了多线程的并发支持。
+        tipNotify = new Consumer<String>() {
+            @Override synchronized
+            public void accept(String s) {
+                message.setText(s);
+            }
+        };
     }
 
     private static IntSupplier cntSupplier = new IntSupplier() {
         private int s = 0;
         @Override
+        synchronized
         public int getAsInt() {
             return s++;
         }
@@ -132,6 +142,7 @@ public class Launch extends Application {
             searchField.addEventHandler(MouseEvent.MOUSE_ENTERED, e -> {
                 tipNotify.accept(map.getOrDefault("searchTip", "输入关键词以搜索相关信息"));
             });
+            searchField.addEventHandler(MouseEvent.MOUSE_EXITED, e -> tipNotify.accept(""));
 
             // 创建搜索按钮
             Button searchConfirmButton = new Button(map.getOrDefault("searchButton", "搜索"));
@@ -142,6 +153,7 @@ public class Launch extends Application {
             searchConfirmButton.addEventHandler(MouseEvent.MOUSE_ENTERED, e -> {
                 tipNotify.accept(map.getOrDefault("searchButtonTip", "点击确认搜索"));
             });
+            searchConfirmButton.addEventHandler(MouseEvent.MOUSE_EXITED, e -> tipNotify.accept(""));
 
             // 将搜索框和搜索按钮一同添加到搜索组件中。
             searchBox.getChildren().addAll(searchField, searchConfirmButton);
@@ -165,7 +177,7 @@ public class Launch extends Application {
     private static TabPane initTabPane(Tab... tabs) {
         TabPane tabPane = new TabPane(tabs);
         if (tabs.length == 0) {
-            tabPane.getTabs().add(tabSupplier.apply(new HashMap<>()));
+            tabPane.getTabs().addAll(tabSupplier.apply(new HashMap<>()), tabSupplier.apply(new HashMap<>()));
         }
         return tabPane;
     }
@@ -267,8 +279,8 @@ public class Launch extends Application {
         // 设置该菜单栏为该应用程序的系统级菜单栏
         menuBar.setUseSystemMenuBar(true);
 
-        menuBar.setPrefHeight(20);
-        menuBar.setPrefWidth(1000);
+//        menuBar.setPrefHeight(20);
+//        menuBar.setPrefWidth(1000);
         root.setTop(menuBar);
 
         Menu menuFile = new Menu("File");
