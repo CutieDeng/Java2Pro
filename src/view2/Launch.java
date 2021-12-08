@@ -5,6 +5,7 @@ import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -127,6 +128,8 @@ public class Launch extends Application {
             // 搜索框
             VBox searchBox = new VBox();
             searchBox.setFocusTraversable(false);
+            searchBox.setSpacing(10);
+            searchBox.setAlignment(Pos.TOP_RIGHT);
 
             // 可键入的搜索框初始化
             TextField searchField = new TextField();
@@ -138,7 +141,7 @@ public class Launch extends Application {
                     Double.parseDouble(map.getOrDefault("searchPrefHeight", "20")));
 
             // 增添提示信息
-            searchField.setPromptText(map.getOrDefault("searchPromptText", "输入关键词以搜索相关信息"));
+            searchField.setPromptText(map.getOrDefault("searchPromptText", "请输入关键词"));
             searchField.addEventHandler(MouseEvent.MOUSE_ENTERED, e -> {
                 tipNotify.accept(map.getOrDefault("searchTip", "输入关键词以搜索相关信息"));
             });
@@ -146,7 +149,7 @@ public class Launch extends Application {
 
             // 创建搜索按钮
             Button searchConfirmButton = new Button(map.getOrDefault("searchButton", "搜索"));
-            searchConfirmButton.setPrefSize(Double.parseDouble(map.getOrDefault("searchButtonPrefWidth", "35")),
+            searchConfirmButton.setPrefSize(Double.parseDouble(map.getOrDefault("searchButtonPrefWidth", "50")),
                     Double.parseDouble(map.getOrDefault("searchPrefHeight", "20")));
 
             // 新增搜索按钮的提示信息
@@ -289,13 +292,7 @@ public class Launch extends Application {
 
         MenuItem tableMenu = new MenuItem("Table");
         menuData.getItems().add(tableMenu);
-        tableMenu.setOnAction(event -> {
-            Tab newTab = new Tab("New Table");
-            //todo 这样子加似乎不行，tablePane再次加在新的tab上，不同tab之间会干扰
-//            newTab.setContent(tablePane);
-//
-//            tabPane.getTabs().add(newTab);
-        });
+        tableMenu.setOnAction(event -> tabPane1.getTabs().add(tabSupplier.apply(new HashMap<>())));
 
 
         MenuItem graphMenu = new MenuItem("Graph");
