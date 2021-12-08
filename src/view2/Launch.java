@@ -168,30 +168,27 @@ public class Launch extends Application {
 
         Menu menuFile = new Menu("File");
         Menu menuData = new Menu("Data");
-        Menu addPage = new Menu("+");
-        menuBar.getMenus().addAll(menuFile, menuData, addPage);
-
-        addPage.setOnAction(event -> {
-            System.out.println("test");
-            Tab newPage = new Tab("New Page");
-            tabPane.getTabs().add(newPage);
-        });
+        menuBar.getMenus().addAll(menuFile, menuData);
 
         MenuItem tableMenu = new MenuItem("Table");
         menuData.getItems().add(tableMenu);
+        tableMenu.setOnAction(event -> {
+            Tab newTab = new Tab("New Table");
+            //todo 这样子加似乎不行，tablePane再次加在新的tab上，不同tab之间会干扰
+            newTab.setContent(tablePane);
+
+            tabPane.getTabs().add(newTab);
+        });
 
 
         MenuItem graphMenu = new MenuItem("Graph");
         menuData.getItems().add(graphMenu);
-
-
-
-        graphMenu.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                System.out.println("hao");
-            }
+        graphMenu.setOnAction(event -> {
+            Tab newTab = new Tab("New Graph");
+            tabPane.getTabs().add(newTab);
         });
+
+
 
 
 
