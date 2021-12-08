@@ -1,25 +1,29 @@
 package view2;
 
 import data.Data;
+import javafx.animation.FadeTransition;
+import javafx.animation.Transition;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import tool.Tool;
 import util.Holder;
 import view.TableRow;
 
+import javax.naming.directory.ModificationItem;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
@@ -54,8 +58,6 @@ public class Launch extends Application {
 
         initTipBox(root, argumentsMap);
 
-
-
         return root;
     }
 
@@ -82,7 +84,50 @@ public class Launch extends Application {
                 message.setText(s);
             }
         };
+
+        // 设置提示框消失动画。
+        FadeTransition goDeath = new FadeTransition(Duration.seconds(2), tipBox);
+        goDeath.setAutoReverse(false);
+        goDeath.setToValue(0.);
+        FadeTransition goLive = new FadeTransition(Duration.seconds(2), tipBox);
+        goLive.setAutoReverse(false);
+        goLive.setToValue(1.);
+        Holder<Boolean> isDeath = new Holder<>(); isDeath.obj = false;
+
+        MenuItem displayTip = new MenuItem("显示/隐藏提示框");
+        displayTip.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+//            synchronized
+            public void handle(ActionEvent event) {
+                isDeath.obj = !isDeath.obj;
+                BorderPane root = (BorderPane) storeMap.get("root");
+                if (!isDeath.obj) {
+                    root.setBottom(tipBox);
+                    goLive.play();
+//                    System.out.println("提示框出现");
+                }
+                else {
+                    goDeath.play();
+                    new Thread(() -> {
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e) {
+                            System.out.println(e);
+                        }
+                        try {
+                            root.bottomProperty().setValue(null);
+                        } catch(IllegalStateException ignored) {
+                        }
+                    }).start();
+//                    System.out.println("提示框消失");
+                }
+            }
+        });
+        displayTip.setAccelerator(new KeyCodeCombination(KeyCode.T, KeyCombination.ALT_DOWN));
+        storeMap.put("displayOption", displayTip);
     }
+
+    private static Map<String, Object> storeMap = new HashMap<>();
 
     private static IntSupplier cntSupplier = new IntSupplier() {
         private int s = 0;
@@ -184,7 +229,9 @@ public class Launch extends Application {
         if (tabs.length == 0) {
             Map<String, String> map = new HashMap<>();
             map.put("title", "Wed, Dec");
-            tabPane.getTabs().addAll(tabSupplier.apply(map), tabSupplier.apply(new HashMap<>()));
+            tabPane.getTabs().addAll(tabSupplier.apply(map)
+//                    , tabSupplier.apply(new HashMap<>())
+            );
         }
         return tabPane;
     }
@@ -247,13 +294,11 @@ public class Launch extends Application {
         return table;
     }
 
-
-
-
-
     @Override
     public void start(Stage primaryStage) throws Exception {
         BorderPane root = initMainPane(new HashMap<>());
+        storeMap.put("root", root);
+        Scene scene = new Scene(root);
 
         TabPane tabPane1 = initTabPane();
         root.setCenter(tabPane1);
@@ -283,20 +328,30 @@ public class Launch extends Application {
         MenuBar menuBar = new MenuBar();
 
         // 设置该菜单栏为该应用程序的系统级菜单栏
-//        menuBar.setUseSystemMenuBar(true);
+        menuBar.setUseSystemMenuBar(true);
 
 //        menuBar.setPrefHeight(20);
 //        menuBar.setPrefWidth(1000);
         root.setTop(menuBar);
 
-        Menu menuFile = new Menu("File");
-        Menu menuData = new Menu("Data");
-        menuBar.getMenus().addAll(menuFile, menuData);
+        Menu menuFile = new Menu("文件");
+        Menu menuData = new Menu("数据");
+        Menu help = new Menu("帮助");
+        menuBar.getMenus().addAll(menuFile, menuData, help);
 
-        MenuItem tableMenu = new MenuItem("Table");
+        {
+            // 设置显示、隐藏提示框的操作，并增加新的快捷键
+            MenuItem displayOption = (MenuItem) storeMap.get("displayOption");
+            help.getItems().add(displayOption);
+            // 快捷键为 Alt + T, means optional to see tip box.
+            KeyCombination combination = new KeyCodeCombination(KeyCode.T, KeyCombination.ALT_DOWN);
+            Mnemonic displayQuickMnemonic = new Mnemonic(displayOption.getGraphic(), combination);
+            scene.addMnemonic(displayQuickMnemonic);
+        }
+
+        MenuItem tableMenu = new MenuItem("表");
         menuData.getItems().add(tableMenu);
         tableMenu.setOnAction(event -> tabPane1.getTabs().add(tabSupplier.apply(new HashMap<>())));
-
 
         MenuItem graphMenu = new MenuItem("Graph");
         menuData.getItems().add(graphMenu);
@@ -306,24 +361,21 @@ public class Launch extends Application {
             tabPane1.getSelectionModel().select(apply);
         });
 
-
-
-
-
-
         //全屏/窗口模式切换
         primaryStage.addEventHandler(KeyEvent.KEY_RELEASED, e -> {
             if (e.getCode() == KeyCode.F11)
                 primaryStage.setFullScreen(!primaryStage.isFullScreen());
         });
+
         primaryStage.setFullScreenExitHint("按 F11 切换全屏/窗口模式");
         primaryStage.setFullScreen(true);
 
-        primaryStage.setScene(new Scene(root));
+        primaryStage.setScene(scene);
         primaryStage.setHeight(630);
         primaryStage.setWidth(1050);
         primaryStage.setTitle("COVID-19 TRACING");
         primaryStage.getIcons().add(new Image("file:"+System.getProperty("user.dir")+"/res/picture/icon1.png"));
+
         primaryStage.show();
     }
 }
