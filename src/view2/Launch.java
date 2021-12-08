@@ -107,6 +107,7 @@ public class Launch extends Application {
         if (!map.containsKey("title")) {
             map.put("title", map.getOrDefault("type", "table") + cntSupplier.getAsInt());
         }
+        returnTab.setText(map.get("title"));
 
         // 设置该标签页内部的页面框架。
         BorderPane graph = new BorderPane();
@@ -273,11 +274,10 @@ public class Launch extends Application {
 //            }
 //        });
 
-
         MenuBar menuBar = new MenuBar();
 
         // 设置该菜单栏为该应用程序的系统级菜单栏
-        menuBar.setUseSystemMenuBar(true);
+//        menuBar.setUseSystemMenuBar(true);
 
 //        menuBar.setPrefHeight(20);
 //        menuBar.setPrefWidth(1000);
@@ -301,8 +301,9 @@ public class Launch extends Application {
         MenuItem graphMenu = new MenuItem("Graph");
         menuData.getItems().add(graphMenu);
         graphMenu.setOnAction(event -> {
-//            Tab newTab = new Tab("New Graph");
-//            tabPane.getTabs().add(newTab);
+            Tab apply = tabSupplier.apply(new HashMap<>());
+            tabPane1.getTabs().add(apply);
+            tabPane1.getSelectionModel().select(apply);
         });
 
 
@@ -314,8 +315,6 @@ public class Launch extends Application {
         primaryStage.addEventHandler(KeyEvent.KEY_RELEASED, e -> {
             if (e.getCode() == KeyCode.F11)
                 primaryStage.setFullScreen(!primaryStage.isFullScreen());
-            else
-                System.out.println(e);
         });
         primaryStage.setFullScreenExitHint("按 F11 切换全屏/窗口模式");
         primaryStage.setFullScreen(true);
