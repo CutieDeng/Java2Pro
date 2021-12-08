@@ -23,6 +23,7 @@ import view.TableRow;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntSupplier;
@@ -103,7 +104,7 @@ public class Launch extends Application {
      *
      *
      */
-    private static final Function<HashMap<String, String>, Tab> tabSupplier = (map) -> {
+    private static final Function<Map<String, String>, Tab> tabSupplier = (map) -> {
         Tab returnTab = new Tab();
         if (!map.containsKey("title")) {
             map.put("title", map.getOrDefault("type", "table") + cntSupplier.getAsInt());
@@ -181,7 +182,9 @@ public class Launch extends Application {
     private static TabPane initTabPane(Tab... tabs) {
         TabPane tabPane = new TabPane(tabs);
         if (tabs.length == 0) {
-            tabPane.getTabs().addAll(tabSupplier.apply(new HashMap<>()), tabSupplier.apply(new HashMap<>()));
+            Map<String, String> map = new HashMap<>();
+            map.put("title", "Wed, Dec");
+            tabPane.getTabs().addAll(tabSupplier.apply(map), tabSupplier.apply(new HashMap<>()));
         }
         return tabPane;
     }

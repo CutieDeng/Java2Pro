@@ -63,7 +63,6 @@ public final class Tool {
             byte[] digest1 = digest.digest();
             StringBuilder result = new StringBuilder(160);
             for (byte b : digest1) {
-                //noinspection MalformedFormatString
                 if ((b & 0xf0) == 0)
                     result.append(0);
                 result.append(String.format("%s", Integer.toHexString(0xff & b)));
