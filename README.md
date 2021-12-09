@@ -303,3 +303,11 @@ todo: 还需要处理的问题：
 - 新增了 class Launch4TipBar, 测试了提示框的显示功能。
 - 调整了 class view2.Launch 的相关内容，以便于能够自动从列信息中导出所需要的信息。
 
+---
+
+*Thu Dec 9 20:00:58 CST 2021*
+
+调整了 GUI 的相关设定。
+
+- 新增了提示框出现、消失的动画，并处理了相关的 BUG. 现在可以通过 <kbd>alt</kbd>/<kbd>option</kbd> + <kbd>T</kbd> 快速执行该动画。
+- 

@@ -63,6 +63,11 @@ public class Launch extends Application {
         return root;
     }
 
+    /**
+     * 初始化提示框，并将提示框的控制命令放入
+     * @param root
+     * @param argumentsMap
+     */
     private static void initTipBox(BorderPane root, HashMap<String, Object> argumentsMap) {
         // 创建消息提示框并设置它的位置。
         VBox tipBox = new VBox();
