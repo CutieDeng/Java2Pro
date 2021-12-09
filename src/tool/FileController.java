@@ -54,7 +54,7 @@ public class FileController {
                     "female_smokers",
                     "male_smokers"
             };
-            basicListColName = Arrays.stream(specialCols).collect(Collectors.toList());
+            higherListColName = Arrays.stream(specialCols).filter(basicListColName::contains).collect(Collectors.toList());
         }
     }
 

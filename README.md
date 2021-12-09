@@ -273,6 +273,32 @@ new_deaths_smoothed_per_million: **//todo**
   - 如果该对象不存在对应的属性，则返回 `null`, 否则不会返回 `null`. 
 - 新增了工具类 `tool.Tool`, 提供了获取文件中 Data 的方法 `List<data.Data> readDataFile(java.io.File file)` 获取文件中所有的数据并汇总成列表。
 
+---
+
+*Thu Dec 9 20:17:59 CST 2021*
+
+添加了一个全局的数据管理接口：`tool.Controller`. 
+
+类 `tool.Controller` 是一个没有扩展性的一个特殊类，专门负责管理我们当前持有的数据。
+
+如果数据列相同，它支持提供更复杂的多源数据内容管理！但它并不支持完全不同的数据表格的数据管理。（或者说，支持的并不好！）
+
+它通过 `tool.Tool` 里的 `hashFileInSHA1` 方法对待查找的函数进行哈希值的计算，并藉此来确定该文件是否被成功读取进文件中。这可以尽可能地减少重复读取文件的可能发生。
+
+*:warning: ​Warning: Sometimes the different files would have the same hash value, but I did not compare them...* 
+
+Controller 使用了基于贪心创建的单例模式，通过全局静态变量 `tool.Controller.instance` 去获取全局唯一的对象并使用。
+
+其对象拥有特殊的成员方法：`getFileData` 将会返回一个 `FileController` 实例，该实例负责承载所有该文件中的数据信息。
+
+另外，类 FileController 的构造器是包可见的，这意味着你不能通过该方法以外的任何方法获取它的实例。
+
+关于 FileController, 其拥有四个公开访问权限的属性：平凡属性行信息，平凡属性列名；高级属性行信息，高级属性行名。
+
+使用**公开访问权限**的意义是，提醒使用者需要自行注意使用无副作用的操作或提前克隆副本以避免污染数据源——一旦程序运行起来，它不会二次读入同一个文件的相关信息。
+
+通过方法访问往往会引起歧义！
+
 ## 图形界面规范
 
 ---
