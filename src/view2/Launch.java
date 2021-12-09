@@ -2,6 +2,8 @@ package view2;
 
 import data.Data;
 import javafx.animation.FadeTransition;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -10,8 +12,6 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.chart.AreaChart;
-import javafx.scene.chart.BarChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
@@ -20,6 +20,8 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import tool.DisplayType;
+import tool.TabArgumentMap;
 import tool.Tool;
 import util.Holder;
 import view.TableRow;
@@ -95,6 +97,7 @@ public class Launch extends Application {
         Holder<Boolean> isDeath = new Holder<>(); isDeath.obj = false;
 
         MenuItem displayTip = new MenuItem("显示/隐藏提示框");
+        //noinspection Convert2Lambda
         displayTip.setOnAction(new EventHandler<ActionEvent>() {
             @Override
 //            synchronized
@@ -108,18 +111,9 @@ public class Launch extends Application {
                 }
                 else {
                     goDeath.play();
-                    new Thread(() -> {
-                        try {
-                            Thread.sleep(2000);
-                        } catch (InterruptedException e) {
-                            System.out.println(e);
-                        }
-                        try {
-                            root.bottomProperty().setValue(null);
-                        } catch(IllegalStateException ignored) {
-                        }
-                    }).start();
-//                    System.out.println("提示框消失");
+                    final Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(2.), e -> root.bottomProperty().set(null)));
+                    timeline.setCycleCount(1);
+                    timeline.play();
                 }
             }
         });
@@ -127,9 +121,9 @@ public class Launch extends Application {
         storeMap.put("displayOption", displayTip);
     }
 
-    private static Map<String, Object> storeMap = new HashMap<>();
+    private static final Map<String, Object> storeMap = new HashMap<>();
 
-    private static IntSupplier cntSupplier = new IntSupplier() {
+    private static final IntSupplier cntSupplier = new IntSupplier() {
         private int s = 0;
         @Override
         synchronized
@@ -149,13 +143,13 @@ public class Launch extends Application {
      *
      *
      */
-    private static final Function<Map<String, String>, Tab> tabSupplier = (map) -> {
+    private static final Function<Map<String, Object>, Tab> tabSupplier = (map) -> {
         Tab returnTab = new Tab();
 
         if (!map.containsKey("title")) {
-            map.put("title", map.getOrDefault("type", "New Page") + cntSupplier.getAsInt());
+            map.put("title", map.getOrDefault("type", "New Page").toString() + cntSupplier.getAsInt());
         }
-        returnTab.setText(map.get("title"));
+        returnTab.setText((String)map.get("title"));
 
         // 设置该标签页内部的页面框架。
         BorderPane viewPane = new BorderPane();
@@ -167,12 +161,12 @@ public class Launch extends Application {
         viewPane.setRight(searchPane);
 
         // 设置搜索、选择页的相关风格
-        searchPane.setStyle(map.getOrDefault("searchPaneStyle", "-fx-background-color: #CCFF99;"));
+        searchPane.setStyle((String )map.getOrDefault("searchPaneStyle", "-fx-background-color: #CCFF99;"));
         // 设置搜索、选择页的宽度
-        searchPane.setPrefWidth(Double.parseDouble(map.getOrDefault("searchPanePrefWidth", "200")));
+        searchPane.setPrefWidth((double)map.getOrDefault("searchPanePrefWidth", 200.));
 
         //设置table页面
-        if (map.getOrDefault("type", "table").equals("table")) {
+        if (map.getOrDefault("type", DisplayType.TABLE) == DisplayType.TABLE) {
 
             // 创建搜索框等相关操作
             {
@@ -188,25 +182,21 @@ public class Launch extends Application {
                 searchField.setFocusTraversable(true);
 
                 // 新增搜索框的大小初始化描述
-                searchField.setPrefSize(Double.parseDouble(map.getOrDefault("searchPrefWidth", "150")),
-                        Double.parseDouble(map.getOrDefault("searchPrefHeight", "20")));
+                searchField.setPrefSize((double )map.getOrDefault("searchPrefWidth", 150.),
+                        (double )map.getOrDefault("searchPrefHeight", 20.));
 
                 // 增添提示信息
-                searchField.setPromptText(map.getOrDefault("searchPromptText", "请输入关键词"));
-                searchField.addEventHandler(MouseEvent.MOUSE_ENTERED, e -> {
-                    tipNotify.accept(map.getOrDefault("searchTip", "输入关键词以搜索相关信息"));
-                });
+                searchField.setPromptText(map.getOrDefault("searchPromptText", "请输入关键词").toString());
+                searchField.addEventHandler(MouseEvent.MOUSE_ENTERED, e -> tipNotify.accept(map.getOrDefault("searchTip", "输入关键词以搜索相关信息").toString()));
                 searchField.addEventHandler(MouseEvent.MOUSE_EXITED, e -> tipNotify.accept(""));
 
                 // 创建搜索按钮
-                Button searchConfirmButton = new Button(map.getOrDefault("searchButton", "搜索"));
-                searchConfirmButton.setPrefSize(Double.parseDouble(map.getOrDefault("searchButtonPrefWidth", "50")),
-                        Double.parseDouble(map.getOrDefault("searchPrefHeight", "20")));
+                Button searchConfirmButton = new Button(map.getOrDefault("searchButton", "搜索").toString());
+                searchConfirmButton.setPrefSize((double )map.getOrDefault("searchButtonPrefWidth", 50.),
+                        (double )map.getOrDefault("searchPrefHeight", 20.));
 
                 // 新增搜索按钮的提示信息
-                searchConfirmButton.addEventHandler(MouseEvent.MOUSE_ENTERED, e -> {
-                    tipNotify.accept(map.getOrDefault("searchButtonTip", "点击确认搜索"));
-                });
+                searchConfirmButton.addEventHandler(MouseEvent.MOUSE_ENTERED, e -> tipNotify.accept(map.getOrDefault("searchButtonTip", "点击确认搜索").toString()));
                 searchConfirmButton.addEventHandler(MouseEvent.MOUSE_EXITED, e -> tipNotify.accept(""));
 
                 // 将搜索框和搜索按钮一同添加到搜索组件中。
@@ -227,15 +217,16 @@ public class Launch extends Application {
 
         }
         //设置graph页面
-        else {
-            VBox choiceBox = new VBox();
-            Label choice1 = new Label("Area Chart");
-            Label choice2 = new Label("Bar Chart");
-            Label choice3 = new Label("Pie Chart");
-            choiceBox.getChildren().addAll(choice1, choice2, choice3);
-            //viewPane.setCenter(graph);
-        }
+        else if (map.get("type") == DisplayType.GRAPH){
 
+            // todo: 创建一个合适的图像以显示相关信息。
+            // 我们会在创建图像的选单中就确定创建什么样的表格信息，不必担心不知道是什么样的表单。
+
+//            VBox choiceBox = new VBox();
+//            Label choice1 = new Label("Area Chart");
+//            Label choice2 = new Label("Bar Chart");
+//            Label choice3 = new Label("Pie Chart");
+        }
 
         return returnTab;
     };
@@ -243,12 +234,17 @@ public class Launch extends Application {
     private static TabPane initTabPane(Tab... tabs) {
         TabPane tabPane = new TabPane(tabs);
         if (tabs.length == 0) {
-            Map<String, String> map = new HashMap<>();
-            map.put("type", "table");
-            map.put("title", "Wed, Dec");
-            tabPane.getTabs().addAll(tabSupplier.apply(map)
-//                    , tabSupplier.apply(new HashMap<>())
-            );
+
+            if ("旧版使用的代码！" == null) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("type", "table");
+                map.put("title", "Wed, Dec");
+                tabPane.getTabs().addAll(tabSupplier.apply(map)
+                );
+            } else {
+                tabPane.getTabs().addAll(tabSupplier.apply(new TabArgumentMap().title("明天你好").type(DisplayType.TABLE)));
+            }
+
         }
         return tabPane;
     }
@@ -360,10 +356,10 @@ public class Launch extends Application {
             // 设置显示、隐藏提示框的操作，并增加新的快捷键
             MenuItem displayOption = (MenuItem) storeMap.get("displayOption");
             help.getItems().add(displayOption);
+
             // 快捷键为 Alt + T, means optional to see tip box.
             KeyCombination combination = new KeyCodeCombination(KeyCode.T, KeyCombination.ALT_DOWN);
-            Mnemonic displayQuickMnemonic = new Mnemonic(displayOption.getGraphic(), combination);
-            scene.addMnemonic(displayQuickMnemonic);
+            scene.getAccelerators().put(combination, displayOption::fire);
         }
 
         MenuItem tableMenu = new MenuItem("表");
@@ -385,7 +381,7 @@ public class Launch extends Application {
             //给apply按钮设置action
             Button applyButton = (Button) setNamePane.lookupButton(ButtonType.APPLY);
             applyButton.setOnAction(e -> {
-                Map<String, String> map = new HashMap<>();
+                Map<String, Object> map = new HashMap<>();
                 map.put("type", "table");
                 if (name.getText() != null) {
                     map.put("title", name.getText());
@@ -404,6 +400,7 @@ public class Launch extends Application {
 
         MenuItem graphMenu = new MenuItem("Graph");
         menuData.getItems().add(graphMenu);
+
         graphMenu.setOnAction(event -> {
             DialogPane setNamePane = new DialogPane();
             setNamePane.setHeaderText("Set Graph Name");
@@ -421,7 +418,7 @@ public class Launch extends Application {
             //给apply按钮设置action
             Button applyButton = (Button) setNamePane.lookupButton(ButtonType.APPLY);
             applyButton.setOnAction(e -> {
-                Map<String, String> map = new HashMap<>();
+                Map<String, Object> map = new HashMap<>();
                 map.put("type", "graph");
                 if (name.getText() != null) {
                     map.put("title", name.getText());
@@ -433,11 +430,7 @@ public class Launch extends Application {
             });
 
             Button cancelButton = (Button) setNamePane.lookupButton(ButtonType.CANCEL);
-            cancelButton.setOnAction(e -> {
-                stage.close();
-            });
-
-
+            cancelButton.setOnAction(e -> stage.close());
         });
 
         //全屏/窗口模式切换
