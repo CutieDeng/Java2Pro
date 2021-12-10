@@ -7,7 +7,7 @@ import java.util.Set;
 
 public class TabArgumentMap implements Map<String, Object> {
 
-    private Map<String, Object> hashmap = new HashMap<>();
+    private final Map<String, Object> hashmap = new HashMap<>();
 
     /**
      * 设置 tab 标签页的标题名。<br>

@@ -20,9 +20,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import tool.DisplayType;
-import tool.TabArgumentMap;
-import tool.Tool;
+import tool.*;
 import util.Holder;
 import view.TableRow;
 
@@ -65,8 +63,8 @@ public class Launch extends Application {
 
     /**
      * 初始化提示框，并将提示框的控制命令放入
-     * @param root
-     * @param argumentsMap
+     * @param root 提示框所在页，也是我们 GUI 的显示主体
+     * @param argumentsMap 初始化提示框的相关参数选择！
      */
     private static void initTipBox(BorderPane root, HashMap<String, Object> argumentsMap) {
         // 创建消息提示框并设置它的位置。
@@ -112,7 +110,6 @@ public class Launch extends Application {
                 if (!isDeath.obj) {
                     root.setBottom(tipBox);
                     goLive.play();
-//                    System.out.println("提示框出现");
                 }
                 else {
                     goDeath.play();
@@ -126,16 +123,10 @@ public class Launch extends Application {
         storeMap.put("displayOption", displayTip);
     }
 
+    /**
+     *
+     */
     private static final Map<String, Object> storeMap = new HashMap<>();
-
-//    private static final IntSupplier cntSupplier = new IntSupplier() {
-//        private int s = 0;
-//        @Override
-//        synchronized
-//        public int getAsInt() {
-//            return s++;
-//        }
-//    };
 
     private static final Function<String, Integer> cntSupplier = new Function<String, Integer>() {
         private final Map<String, Integer> supplierMap = new HashMap<>();
@@ -149,6 +140,16 @@ public class Launch extends Application {
         }
     };
 
+    /**
+     * 通过调用该方法实现对提示框内信息的控制。<br>
+     * <p/>
+     *
+     * 该方法提供了并发支持。<br>
+     * 请不要担心在多线程并发情况下该方法的错误。<br>
+     * <p/>
+     *
+     *
+     */
     private static Consumer<String> tipNotify;
 
     /**
@@ -158,7 +159,9 @@ public class Launch extends Application {
      * 通过映射表可以设置特定的参数以便于获取该标签页的性质进行修改。<br>
      * <p/>
      *
-     *
+     * 建议使用 {@link TabArgumentMap} 对标签页的性质进行初始化。<br>
+     * 你可以很容易地确定你可以设置的属性名和其相关的类型参数。<br>
+     * <p/>
      */
     private static final Function<Map<String, Object>, Tab> tabSupplier = (map) -> {
         Tab returnTab = new Tab();
@@ -253,6 +256,7 @@ public class Launch extends Application {
         TabPane tabPane = new TabPane(tabs);
         if (tabs.length == 0) {
 
+            //noinspection ConstantConditions
             if ("旧版使用的代码！" == null) {
                 Map<String, Object> map = new HashMap<>();
                 map.put("type", "table");
@@ -267,6 +271,7 @@ public class Launch extends Application {
         return tabPane;
     }
 
+    @SuppressWarnings("DeprecatedIsStillUsed")
     @Deprecated
     private static TableView<TableRow> initTableView() {
         TableView<TableRow> table = new TableView<>();
@@ -309,8 +314,17 @@ public class Launch extends Application {
         };
 
         // 获取列名及各行信息
+        //noinspection ConstantConditions
+        if (false) {
+            // 旧版本代码！
+            Holder<List<String>> holder = new Holder<>();
+            List<Data> allData = Tool.readDataFile(Paths.get("res", "file", "owid-covid-data.csv").toFile(), holder);
+        }
+        // 新版本代码
+        FileController fileData = Controller.instance.getFileData(Paths.get("res", "file", "owid-covid-data.csv").toFile());
+        List<Data> allData = fileData.higherList;
         Holder<List<String>> holder = new Holder<>();
-        List<Data> allData = Tool.readDataFile(Paths.get("res", "file", "owid-covid-data.csv").toFile(), holder);
+        holder.obj = fileData.higherListColName;
 
         // 创建各列信息
         holder.obj.forEach(s -> table.getColumns().add(strMap.andThen(normalColGenerator).apply(s)));
@@ -325,45 +339,23 @@ public class Launch extends Application {
         return table;
     }
 
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-        BorderPane root = initMainPane(new HashMap<>());
-        storeMap.put("root", root);
-        Scene scene = new Scene(root);
-
-        TabPane tabPane1 = initTabPane();
-        root.setCenter(tabPane1);
-
-        //根据search的内容，重载tableView里的数据
-//        final Consumer<Event> doSearch = event -> {
-//            String searchText = searchBox.getText();
-//            ObservableList<TableRow> searchData = FXCollections.observableArrayList();
-//            List<Data> data = Tool.readDataFile(Paths.get("res", "file", "owid-covid-data.csv").toFile());
-//            data.stream()
-//                    .filter(d -> d.fetch("iso code").equals(searchText))
-//                    .map(TableRow::new).forEach(searchData::add);
-//            data.stream()
-//                    .filter(d -> d.fetch("date").equals(searchText))
-//                    .map(TableRow::new).forEach(searchData::add);
-//
-//            table.setItems(searchData);
-//        };
-
-//        searchButton.addEventHandler(MouseEvent.MOUSE_CLICKED, doSearch::accept);
-//        searchBox.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-//            if (event.getCode() == KeyCode.ENTER) {
-//                doSearch.accept(event);
-//            }
-//        });
-
+    /**
+     * 该方法会初始化 JavaFX 的菜单栏。<br>
+     * <p/>
+     *
+     * 该方法将会初始化出 Application layer 的菜单栏。<br>
+     * 建议使用弱链接【高耦合】映射表延迟绑定菜单栏的功能实现。<br>
+     * 因为菜单栏在很早的时期便进行初始化。<br>
+     * 而其他的功能界面此时还尚未开始创建！<br>
+     * <p/>
+     *
+     * @return 初始化后的菜单栏。
+     */
+    private static MenuBar initMenuBar(Scene accelerateScene) {
         MenuBar menuBar = new MenuBar();
 
         // 设置该菜单栏为该应用程序的系统级菜单栏
         menuBar.setUseSystemMenuBar(true);
-
-//        menuBar.setPrefHeight(20);
-//        menuBar.setPrefWidth(1000);
-        root.setTop(menuBar);
 
         Menu menuFile = new Menu("文件");
         Menu menuData = new Menu("数据");
@@ -377,7 +369,7 @@ public class Launch extends Application {
 
             // 快捷键为 Alt + T, means optional to see tip box.
             KeyCombination combination = new KeyCodeCombination(KeyCode.T, KeyCombination.ALT_DOWN);
-            scene.getAccelerators().put(combination, displayOption::fire);
+            accelerateScene.getAccelerators().put(combination, displayOption::fire);
         }
 
         MenuItem tableMenu = new MenuItem("表");
@@ -397,7 +389,7 @@ public class Launch extends Application {
             stage.setScene(stageScene);
             stage.show();
 
-            final Consumer<Object> tableAction = (o) -> {
+            final Consumer<Void> tableAction = (o) -> {
                 Map<String, Object> map;
                 if (!name.getText().equals("")) {
                     map = new TabArgumentMap().title(name.getText()).type(DisplayType.TABLE);
@@ -405,23 +397,32 @@ public class Launch extends Application {
                 else map = new TabArgumentMap().type(DisplayType.TABLE);
 
                 Tab apply = tabSupplier.apply(map);
+
+                TabPane tabPane1 = (TabPane) storeMap.get("tabPane");
+
                 tabPane1.getTabs().add(apply);
                 tabPane1.getSelectionModel().select(apply);
                 stage.close();
             };
 
-
+            // [Error]: 请不要对窗口层次监听与窗口无关的快捷键！
             //设置Enter快捷键
-            stageScene.setOnKeyPressed(e -> {
-                if (e.getCode() == KeyCode.ENTER)
-                    tableAction.accept(new Object());
-            });
+//            stageScene.setOnKeyPressed(e -> {
+//                if (e.getCode() == KeyCode.ENTER)
+//                    tableAction.accept(new Object());
+//            });
 
             //给apply按钮设置action
             Button applyButton = (Button) setNamePane.lookupButton(ButtonType.APPLY);
-            applyButton.setOnAction(e -> tableAction.accept(new Object()));
+            // 设置允许聚焦选项
+            applyButton.setFocusTraversable(true);
+            // 将默认的窗口聚焦拉到它上面！
+            applyButton.requestFocus();
+            applyButton.setOnAction(e -> tableAction.accept(null));
 
+            // 设置取消按钮
             Button cancelButton = (Button) setNamePane.lookupButton(ButtonType.CANCEL);
+            cancelButton.setFocusTraversable(true);
             cancelButton.setOnAction(e -> stage.close());
         });
 
@@ -430,7 +431,7 @@ public class Launch extends Application {
 
         graphMenu.setOnAction(event -> {
             DialogPane setNamePane = new DialogPane();
-            setNamePane.setHeaderText("Set Graph Name");
+            setNamePane.setHeaderText("设置图页名称");
             TextField name = new TextField();
             setNamePane.setContent(name);
             setNamePane.getButtonTypes().add(ButtonType.CANCEL);
@@ -439,7 +440,7 @@ public class Launch extends Application {
             Scene stageScene = new Scene(setNamePane);
             Stage stage = new Stage();
             stage.setWidth(300);
-            stage.setTitle("Set Name");
+            stage.setTitle("设置图页名称");
             stage.setScene(stageScene);
             stage.show();
 
@@ -451,16 +452,18 @@ public class Launch extends Application {
                 else map = new TabArgumentMap().type(DisplayType.GRAPH);
 
                 Tab apply = tabSupplier.apply(map);
-                tabPane1.getTabs().add(apply);
-                tabPane1.getSelectionModel().select(apply);
+                TabPane tabPane = (TabPane) storeMap.get("tabPane");
+                tabPane.getTabs().add(apply);
+                tabPane.getSelectionModel().select(apply);
                 stage.close();
             };
 
-            //设置Enter快捷键
-            stageScene.setOnKeyPressed(e -> {
-                if (e.getCode() == KeyCode.ENTER)
-                    graphAction.accept(new Object());
-            });
+            // [Warning]: 请不要使用这样的方式设置快捷键
+//            //设置Enter快捷键
+//            stageScene.setOnKeyPressed(e -> {
+//                if (e.getCode() == KeyCode.ENTER)
+//                    graphAction.accept(new Object());
+//            });
 
             //给apply按钮设置action
             Button applyButton = (Button) setNamePane.lookupButton(ButtonType.APPLY);
@@ -469,6 +472,25 @@ public class Launch extends Application {
             Button cancelButton = (Button) setNamePane.lookupButton(ButtonType.CANCEL);
             cancelButton.setOnAction(e -> stage.close());
         });
+
+        return menuBar;
+    }
+
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        BorderPane root = initMainPane(new HashMap<>());
+        storeMap.put("root", root);
+
+        Scene scene = new Scene(root);
+        storeMap.put("scene", scene);
+
+        // 设置菜单栏位于主页上面。
+        // 注意到，菜单栏设置时，其主体页面还尚未被创建。
+        root.setTop(initMenuBar(scene));
+
+        TabPane tabPane1 = initTabPane();
+        storeMap.put("tabPane", tabPane1);
+        root.setCenter(tabPane1);
 
         //全屏/窗口模式切换
         primaryStage.addEventHandler(KeyEvent.KEY_RELEASED, e -> {
