@@ -152,9 +152,9 @@ public class Launch extends Application {
         Tab returnTab = new Tab();
 
         if (!map.containsKey("title")) {
-            map.put("title", map.getOrDefault("type", "New Page").toString() + cntSupplier.getAsInt());
+            map.put("title", map.getOrDefault("type", "New Page").toString() + " " + cntSupplier.getAsInt());
         }
-        returnTab.setText((String)map.get("title"));
+        returnTab.setText((String) map.get("title"));
 
         // 设置该标签页内部的页面框架。
         BorderPane viewPane = new BorderPane();
@@ -386,11 +386,12 @@ public class Launch extends Application {
             //给apply按钮设置action
             Button applyButton = (Button) setNamePane.lookupButton(ButtonType.APPLY);
             applyButton.setOnAction(e -> {
-                Map<String, Object> map = new HashMap<>();
-                map.put("type", "table");
-                if (name.getText() != null) {
-                    map.put("title", name.getText());
+                Map<String, Object> map;
+                if (!name.getText().equals("")) {
+                    map = new TabArgumentMap().title(name.getText()).type(DisplayType.TABLE);
                 }
+                else map = new TabArgumentMap().type(DisplayType.TABLE);
+
                 Tab apply = tabSupplier.apply(map);
                 tabPane1.getTabs().add(apply);
                 tabPane1.getSelectionModel().select(apply);
@@ -423,11 +424,12 @@ public class Launch extends Application {
             //给apply按钮设置action
             Button applyButton = (Button) setNamePane.lookupButton(ButtonType.APPLY);
             applyButton.setOnAction(e -> {
-                Map<String, Object> map = new HashMap<>();
-                map.put("type", "graph");
-                if (name.getText() != null) {
-                    map.put("title", name.getText());
+                Map<String, Object> map;
+                if (!name.getText().equals("")) {
+                    map = new TabArgumentMap().type(DisplayType.GRAPH).title(name.getText());
                 }
+                else map = new TabArgumentMap().type(DisplayType.GRAPH);
+
                 Tab apply = tabSupplier.apply(map);
                 tabPane1.getTabs().add(apply);
                 tabPane1.getSelectionModel().select(apply);
