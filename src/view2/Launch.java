@@ -419,11 +419,13 @@ public class Launch extends Application {
             // 将默认的窗口聚焦拉到它上面！
             applyButton.requestFocus();
             applyButton.setOnAction(e -> tableAction.accept(null));
+            Tool.setEnterKeyForButton(applyButton);
 
             // 设置取消按钮
             Button cancelButton = (Button) setNamePane.lookupButton(ButtonType.CANCEL);
             cancelButton.setFocusTraversable(true);
             cancelButton.setOnAction(e -> stage.close());
+            Tool.setEnterKeyForButton(cancelButton);
         });
 
         MenuItem graphMenu = new MenuItem("Graph");

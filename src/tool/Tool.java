@@ -1,6 +1,10 @@
 package tool;
 
 import data.Data;
+import javafx.event.EventType;
+import javafx.scene.control.Button;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import util.Holder;
 
 import java.io.*;
@@ -72,6 +76,13 @@ public final class Tool {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static void setEnterKeyForButton(Button button) {
+        button.addEventHandler(KeyEvent.KEY_RELEASED, e -> {
+            if (e.getCode() == KeyCode.ENTER)
+                button.fire();
+        });
     }
 
 }
