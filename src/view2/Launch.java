@@ -377,15 +377,14 @@ public class Launch extends Application {
             setNamePane.getButtonTypes().add(ButtonType.CANCEL);
             setNamePane.getButtonTypes().add(ButtonType.APPLY);
 
+            Scene stageScene = new Scene(setNamePane);
             Stage stage = new Stage();
             stage.setWidth(300);
             stage.setTitle("Set Name");
-            stage.setScene(new Scene(setNamePane));
+            stage.setScene(stageScene);
             stage.show();
 
-            //给apply按钮设置action
-            Button applyButton = (Button) setNamePane.lookupButton(ButtonType.APPLY);
-            applyButton.setOnAction(e -> {
+            final Consumer<Object> tableAction = (o) -> {
                 Map<String, Object> map;
                 if (!name.getText().equals("")) {
                     map = new TabArgumentMap().title(name.getText()).type(DisplayType.TABLE);
@@ -396,12 +395,21 @@ public class Launch extends Application {
                 tabPane1.getTabs().add(apply);
                 tabPane1.getSelectionModel().select(apply);
                 stage.close();
+            };
+
+
+            //设置Enter快捷键
+            stageScene.setOnKeyPressed(e -> {
+                if (e.getCode() == KeyCode.ENTER)
+                    tableAction.accept(new Object());
             });
 
+            //给apply按钮设置action
+            Button applyButton = (Button) setNamePane.lookupButton(ButtonType.APPLY);
+            applyButton.setOnAction(e -> tableAction.accept(new Object()));
+
             Button cancelButton = (Button) setNamePane.lookupButton(ButtonType.CANCEL);
-            cancelButton.setOnAction(e -> {
-                stage.close();
-            });
+            cancelButton.setOnAction(e -> stage.close());
         });
 
         MenuItem graphMenu = new MenuItem("Graph");
@@ -415,15 +423,14 @@ public class Launch extends Application {
             setNamePane.getButtonTypes().add(ButtonType.CANCEL);
             setNamePane.getButtonTypes().add(ButtonType.APPLY);
 
+            Scene stageScene = new Scene(setNamePane);
             Stage stage = new Stage();
             stage.setWidth(300);
             stage.setTitle("Set Name");
-            stage.setScene(new Scene(setNamePane));
+            stage.setScene(stageScene);
             stage.show();
 
-            //给apply按钮设置action
-            Button applyButton = (Button) setNamePane.lookupButton(ButtonType.APPLY);
-            applyButton.setOnAction(e -> {
+            final Consumer<Object> graphAction = (o) -> {
                 Map<String, Object> map;
                 if (!name.getText().equals("")) {
                     map = new TabArgumentMap().type(DisplayType.GRAPH).title(name.getText());
@@ -434,7 +441,17 @@ public class Launch extends Application {
                 tabPane1.getTabs().add(apply);
                 tabPane1.getSelectionModel().select(apply);
                 stage.close();
+            };
+
+            //设置Enter快捷键
+            stageScene.setOnKeyPressed(e -> {
+                if (e.getCode() == KeyCode.ENTER)
+                    graphAction.accept(new Object());
             });
+
+            //给apply按钮设置action
+            Button applyButton = (Button) setNamePane.lookupButton(ButtonType.APPLY);
+            applyButton.setOnAction(e -> graphAction.accept(new Object()));
 
             Button cancelButton = (Button) setNamePane.lookupButton(ButtonType.CANCEL);
             cancelButton.setOnAction(e -> stage.close());
