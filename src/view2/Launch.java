@@ -128,12 +128,24 @@ public class Launch extends Application {
 
     private static final Map<String, Object> storeMap = new HashMap<>();
 
-    private static final IntSupplier cntSupplier = new IntSupplier() {
-        private int s = 0;
+//    private static final IntSupplier cntSupplier = new IntSupplier() {
+//        private int s = 0;
+//        @Override
+//        synchronized
+//        public int getAsInt() {
+//            return s++;
+//        }
+//    };
+
+    private static final Function<String, Integer> cntSupplier = new Function<String, Integer>() {
+        private final Map<String, Integer> supplierMap = new HashMap<>();
         @Override
         synchronized
-        public int getAsInt() {
-            return s++;
+        public Integer apply(String s) {
+            if (!supplierMap.containsKey(s)) {
+                supplierMap.put(s, 1);
+            } else supplierMap.put(s, supplierMap.get(s) + 1);
+            return supplierMap.get(s);
         }
     };
 
@@ -152,9 +164,10 @@ public class Launch extends Application {
         Tab returnTab = new Tab();
 
         if (!map.containsKey("title")) {
-            map.put("title", map.getOrDefault("type", "New Page").toString() + " " + cntSupplier.getAsInt());
+            String type = map.getOrDefault("type", "New Page").toString();
+            map.put("title", type + " " + cntSupplier.apply(type));
         }
-        returnTab.setText((String) map.get("title"));
+        returnTab.setText(map.get("title").toString());
 
         // 设置该标签页内部的页面框架。
         BorderPane viewPane = new BorderPane();
@@ -464,7 +477,7 @@ public class Launch extends Application {
         });
 
         primaryStage.setFullScreenExitHint("按 F11 切换全屏/窗口模式");
-        primaryStage.setFullScreen(true);
+        primaryStage.setFullScreen(false);
 
         primaryStage.setScene(scene);
         primaryStage.setHeight(630);
