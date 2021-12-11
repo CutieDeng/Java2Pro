@@ -238,11 +238,13 @@ public class Launch extends Application {
                     searchField.setText(date);
                 });
 
+                datePicker.setOnAction(e -> searchAction.accept(searchField.getText()));
+
 
             }
 
 
-            // 创建图表的相关操作
+            // 创建表的相关操作
             {
                 @SuppressWarnings("unchecked")
                 TableView<Tmp> tableRowTableView = initTableView((List<String>)map.get("colNames"), (List<Data>) map.get("rows"));
@@ -274,7 +276,6 @@ public class Launch extends Application {
         }
         //设置graph页面
         else if (map.get("type") == DisplayType.GRAPH){
-
             // 大工程hhh, 怎么做图呢？
 
             // 先规约一个图的细选择吧。。。
@@ -356,7 +357,29 @@ public class Launch extends Application {
                         break;
                 }
             }
+            // todo: 创建一个合适的图像以显示相关信息。
 
+            //单选框
+//            ToggleGroup toggleGroup = new ToggleGroup();
+//            RadioButton areaButton = new RadioButton("Area Chart");
+//            RadioButton barButton = new RadioButton("Bar Chart");
+//            RadioButton pieButton = new RadioButton("Pie Chart");
+//            areaButton.setToggleGroup(toggleGroup);
+//            barButton.setToggleGroup(toggleGroup);
+//            pieButton.setToggleGroup(toggleGroup);
+//
+//            VBox singleBox = new VBox();
+//            singleBox.getChildren().addAll(areaButton, barButton, pieButton);
+//            searchPane.getChildren().add(singleBox);
+//
+//
+//            //多选框
+//            VBox multiBox = new VBox();
+//            CheckBox country1 = new CheckBox("country1");
+//            CheckBox country2 = new CheckBox("country2");
+//            multiBox.getChildren().addAll(country1, country2);
+//            searchPane.getChildren().add(multiBox);
+            // 我们会在创建图像的选单中就确定创建什么样的表格信息，不必担心不知道是什么样的表单。
         }
 
         return returnTab;
