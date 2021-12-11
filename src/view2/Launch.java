@@ -23,8 +23,6 @@ import javafx.util.Duration;
 import tool.*;
 import util.Holder;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -307,6 +305,8 @@ public class Launch extends Application {
         else if (map.get("type") == DisplayType.GRAPH){
 
             // todo: 创建一个合适的图像以显示相关信息。
+
+            //单选框
             ToggleGroup toggleGroup = new ToggleGroup();
             RadioButton areaButton = new RadioButton("Area Chart");
             RadioButton barButton = new RadioButton("Bar Chart");
@@ -315,9 +315,18 @@ public class Launch extends Application {
             barButton.setToggleGroup(toggleGroup);
             pieButton.setToggleGroup(toggleGroup);
 
-            VBox vbox = new VBox();
-            vbox.getChildren().addAll(areaButton, barButton, pieButton);
-            searchPane.getChildren().add(vbox);
+            VBox singleBox = new VBox();
+            singleBox.getChildren().addAll(areaButton, barButton, pieButton);
+            searchPane.getChildren().add(singleBox);
+
+
+            //多选框
+            VBox multiBox = new VBox();
+            CheckBox country1 = new CheckBox("country1");
+            CheckBox country2 = new CheckBox("country2");
+            multiBox.getChildren().addAll(country1, country2);
+            searchPane.getChildren().add(multiBox);
+
 
 
 
