@@ -237,6 +237,8 @@ public class Launch extends Application {
                     String date = newValue.format(DateTimeFormatter.ISO_DATE);
                     searchField.setText(date);
                 });
+                datePicker.addEventFilter(MouseEvent.MOUSE_ENTERED, e -> tipNotify.accept("通过点击日期快速搜索对应时间"));
+                datePicker.addEventFilter(MouseEvent.MOUSE_EXITED, e -> tipNotify.accept(""));
 
                 datePicker.setOnAction(e -> searchAction.accept(searchField.getText()));
 
@@ -326,26 +328,60 @@ public class Launch extends Application {
 
                             Iterator<Map.Entry<String, List<Data>>> iterator = dateToData.entrySet().iterator();
 
-                            Timeline animationOnce = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
-                                if (iterator.hasNext()) {
-                                    Map.Entry<String, List<Data>> next = iterator.next();
-                                    dateList.add(next.getKey());
-                                    next.getValue().forEach(r -> {
-                                        if (!splitMap.containsKey(r.fetch(mainColName))) {
-                                            XYChart.Series<String, Number> countrySeries = new XYChart.Series<>();
-                                            countrySeries.setName(r.fetch(mainColName));
-                                            splitMap.put(r.fetch(mainColName), countrySeries);
-                                            countriesList.add(countrySeries);
+                            KeyFrame displayingFrame = new KeyFrame(Duration.seconds(1.),
+                                    e -> {
+                                        synchronized (iterator) {
+                                            if (iterator.hasNext()) {
+                                                Map.Entry<String, List<Data>> next = iterator.next();
+                                                dateList.add(next.getKey());
+                                                next.getValue().forEach(r -> {
+                                                    if (!splitMap.containsKey(r.fetch(mainColName))) {
+                                                        XYChart.Series<String, Number> countrySeries = new XYChart.Series<>();
+                                                        countrySeries.setName(r.fetch(mainColName));
+                                                        splitMap.put(r.fetch(mainColName), countrySeries);
+                                                        countriesList.add(countrySeries);
+                                                    }
+                                                    splitMap.get(r.fetch(mainColName)).getData().add(new XYChart.Data<>(r.fetch(minorColName),
+                                                            (Double.parseDouble("0" + r.fetch(valueColumn)))
+                                                    ));
+                                                });
+                                            }
                                         }
-                                        splitMap.get(r.fetch(mainColName)).getData().add(new XYChart.Data<>(r.fetch(minorColName),
-                                                (Double.parseDouble("0" + r.fetch(valueColumn)))
-                                        ));
                                     });
+
+                            KeyFrame displayingAll = new KeyFrame(Duration.INDEFINITE, e -> {
+                                synchronized (iterator) {
+                                    while (iterator.hasNext()) {
+                                        Map.Entry<String, List<Data>> next = iterator.next();
+                                        dateList.add(next.getKey());
+                                        next.getValue().forEach(r -> {
+                                            if (!splitMap.containsKey(r.fetch(mainColName))) {
+                                                XYChart.Series<String, Number> countrySeries = new XYChart.Series<>();
+                                                countrySeries.setName(r.fetch(mainColName));
+                                                splitMap.put(r.fetch(mainColName), countrySeries);
+                                                countriesList.add(countrySeries);
+                                            }
+                                            splitMap.get(r.fetch(mainColName)).getData().add(new XYChart.Data<>(r.fetch(minorColName),
+                                                    (Double.parseDouble("0" + r.fetch(valueColumn)))
+                                            ));
+                                        });
+                                    }
                                 }
-                            }));
+                            });
+
+                            Timeline animationOnce = new Timeline(displayingFrame);
 
                             animationOnce.setAutoReverse(false);
                             animationOnce.setCycleCount(dateToData.size());
+
+                            Timeline specialStopAnimation = new Timeline(displayingAll);
+                            specialStopAnimation.setCycleCount(1);
+                            specialStopAnimation.setAutoReverse(false);
+
+                            chartPane.addEventHandler(KeyEvent.KEY_PRESSED, k -> {
+                                if (k.getCode() == KeyCode.SPACE)
+                                    specialStopAnimation.play();
+                            });
 
                             // 为原来的初始化操作新增一个动作！现在初始化的过程将会播放动画！
                             initPerform.obj = initPerform.obj.andThen((V) -> animationOnce.play());
@@ -450,9 +486,8 @@ public class Launch extends Application {
                     return true;
                 if (s.equals("population"))
                     return true;
-                if (s.endsWith("Tests")) {
+                if (s.endsWith("Tests"))
                     return true;
-                }
                 if (s.endsWith("Admissions"))
                     return true;
                 if (s.endsWith("Patients"))

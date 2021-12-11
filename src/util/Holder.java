@@ -18,7 +18,6 @@ public class Holder<T> {
      * @param obj 待比较的对象
      * @return true 如果两个对象相同
      */
-    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     @Override
     public boolean equals(Object obj) {
         assert (this != this.obj);

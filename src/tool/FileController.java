@@ -25,7 +25,7 @@ public class FileController {
         // 二次筛选！
         {
             HashSet<String> special = new HashSet<>();
-            basicList.stream().forEach(b -> {
+            basicList.forEach(b -> {
                 if (special.contains(b.fetch("iso code")))
                     return ;
                 special.add(b.fetch("iso code"));
