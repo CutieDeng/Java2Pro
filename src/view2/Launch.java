@@ -267,14 +267,26 @@ public class Launch extends Application {
 
                     List<Data> searchData = (List<Data>) map.get("rows");
 
-                    //todo: need to be tested
-                    searchData.stream().map(Tool::createRow)
-                        .filter(row -> {
-                            Map<String, String> searchMap = Tool.getSearchProperties(row);
-                            return searchText.equals(searchMap.get("location")) || searchText.equals(searchMap.get("iso"))
-                                    || searchText.equals(searchMap.get("date"));
-                        })
-                        .forEach(searchList::add);
+                    // 小修小补...
+                    if (false) {
+                        searchData.stream().map(Tool::createRow)
+                                .filter(row -> {
+                                    Map<String, String> searchMap = Tool.getSearchProperties(row);
+                                    return searchText.equals(searchMap.get("location")) || searchText.equals(searchMap.get("iso"))
+                                            || searchText.equals(searchMap.get("date"));
+                                })
+                                .forEach(searchList::add);
+                    } else {
+                        searchData.stream().filter(d -> {
+                            if (d.fetch("location").contains(searchText))
+                                return true;
+                            if (d.fetch("iso code").contains(searchText))
+                                return true;
+                            if (d.fetch("date").equals(searchText))
+                                return true;
+                            return false;
+                        }).map(Tool::createRow).forEach(searchList::add);
+                    }
 
                     tableRowTableView.setItems(searchList);
                 };
