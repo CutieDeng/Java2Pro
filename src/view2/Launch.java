@@ -30,9 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.IntSupplier;
 import java.util.function.ToIntFunction;
-
 
 public class Launch extends Application {
 
@@ -128,11 +126,11 @@ public class Launch extends Application {
      */
     private static final Map<String, Object> storeMap = new HashMap<>();
 
-    private static final Function<String, Integer> cntSupplier = new Function<String, Integer>() {
+    private static final ToIntFunction<String> cntSupplier = new ToIntFunction<String>() {
         private final Map<String, Integer> supplierMap = new HashMap<>();
         @Override
         synchronized
-        public Integer apply(String s) {
+        public int applyAsInt(String s) {
             if (!supplierMap.containsKey(s)) {
                 supplierMap.put(s, 1);
             } else supplierMap.put(s, supplierMap.get(s) + 1);
@@ -168,7 +166,7 @@ public class Launch extends Application {
 
         if (!map.containsKey("title")) {
             String type = map.getOrDefault("type", "New Page").toString();
-            map.put("title", type + " " + cntSupplier.apply(type));
+            map.put("title", type + " " + cntSupplier.applyAsInt(type));
         }
         returnTab.setText(map.get("title").toString());
 
