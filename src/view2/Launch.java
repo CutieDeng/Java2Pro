@@ -182,6 +182,8 @@ public class Launch extends Application {
         //设置table页面
         if (map.getOrDefault("type", DisplayType.TABLE) == DisplayType.TABLE) {
 
+            final Holder<Consumer<String>> holder = new Holder<>();
+
             // 创建搜索框等相关操作
             {
                 // 搜索框
@@ -199,10 +201,14 @@ public class Launch extends Application {
                 searchField.setPrefSize((double )map.getOrDefault("searchPrefWidth", 150.),
                         (double )map.getOrDefault("searchPrefHeight", 20.));
 
+                // 搜索会发生的事情
+                final Consumer<String> searchAction = (searchContent) -> holder.obj.accept(searchContent);
+
                 // 增添提示信息
                 searchField.setPromptText(map.getOrDefault("searchPromptText", "请输入关键词").toString());
                 searchField.addEventHandler(MouseEvent.MOUSE_ENTERED, e -> tipNotify.accept(map.getOrDefault("searchTip", "输入关键词以搜索相关信息").toString()));
                 searchField.addEventHandler(MouseEvent.MOUSE_EXITED, e -> tipNotify.accept(""));
+
 
                 // 创建搜索按钮
                 Button searchConfirmButton = new Button(map.getOrDefault("searchButton", "搜索").toString());
@@ -218,6 +224,11 @@ public class Launch extends Application {
 
                 // 搜索组件放入右侧快捷栏中。
                 searchPane.getChildren().add(searchBox);
+
+                // 集中处理搜索事件
+                searchField.setOnAction(e -> searchAction.accept(searchField.getText()));
+                searchConfirmButton.setOnAction(e -> searchAction.accept(searchField.getText()));
+
             }
 
 
@@ -228,6 +239,9 @@ public class Launch extends Application {
                 viewPane.setCenter(tableRowTableView);
                 // 稍稍设置一下相关的图形参数吧，让它好看点
                 tableRowTableView.setPadding(new Insets(20));
+
+                // 设置搜索会发生的事情
+
             }
 
         }
