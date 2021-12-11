@@ -248,18 +248,7 @@ public class Launch extends Application {
     private static TabPane initTabPane(Tab... tabs) {
         TabPane tabPane = new TabPane(tabs);
         if (tabs.length == 0) {
-
-            //noinspection ConstantConditions
-            if ("旧版使用的代码！" == null) {
-                Map<String, Object> map = new HashMap<>();
-                map.put("type", "table");
-                map.put("title", "Wed, Dec");
-                tabPane.getTabs().addAll(tabSupplier.apply(map)
-                );
-            } else {
-                tabPane.getTabs().addAll(tabSupplier.apply(new TabArgumentMap().title("明天你好").type(DisplayType.TABLE)));
-            }
-
+            tabPane.getTabs().addAll(tabSupplier.apply(new TabArgumentMap().type(DisplayType.TABLE)));
         }
         return tabPane;
     }

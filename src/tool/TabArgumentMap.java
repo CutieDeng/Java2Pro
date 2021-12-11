@@ -1,9 +1,6 @@
 package tool;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class TabArgumentMap implements Map<String, Object> {
 
@@ -73,6 +70,16 @@ public class TabArgumentMap implements Map<String, Object> {
      */
     public TabArgumentMap searchPaneStyle(String style) {
         put(style);
+        return this;
+    }
+
+    public TabArgumentMap colNames(List<String> cols) {
+        put(cols);
+        return this;
+    }
+
+    public TabArgumentMap rows(List<String> rows) {
+        put(rows);
         return this;
     }
 
