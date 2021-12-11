@@ -1,15 +1,16 @@
 package tool;
 
 import data.Data;
-import javafx.event.EventType;
 import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import util.Holder;
+import view2.Tmp;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 import java.io.*;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -20,6 +21,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -88,12 +90,43 @@ public final class Tool {
         });
     }
 
+    public static String transferReverse(String s) {
+        char[] cs = s.toCharArray();
+        StringBuilder builder = new StringBuilder();
+        boolean flag = false;
+        for (char c : cs) {
+            if (c == '_') {
+                flag = true;
+                continue;
+            }
+            if (!flag) {
+                builder.append(c);
+            } else {
+                if (c >= 'a' && c <= 'z')
+                    builder.append((char)(c + 'A' - 'a'));
+                else
+                    builder.append(c);
+            }
+            flag = false;
+        }
+        return builder.toString();
+    }
+
     public static String transfer(String name) {
         char[] chars = name.toCharArray();
         StringBuilder ans = new StringBuilder();
+        boolean numberFlag = false;
+        // todo: 内含大量 BUG!
         for (char c : chars) {
             if (c >= 'A' && c <= 'Z')
                 ans.append(' ').append((char)(c + 'a' - 'A'));
+            else if (c >= '0' && c <= '9') {
+                if (!numberFlag)
+                    ans.append(' ').append(c);
+                else
+                    ans.append(c);
+                numberFlag = true;
+            }
             else
                 ans.append(c);
         }
@@ -104,7 +137,13 @@ public final class Tool {
         createClass(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
     }
 
+
+    private static boolean createClassFlag = false;
+
+    synchronized
     public static boolean createClass(List<String> stringProperties, List<String> intProperties, List<String> doubleProperties) {
+        if (createClassFlag)
+            return true;
         final File classFile = Paths.get("src", "view2", "TmpRow.java").toFile();
         try (PrintStream stream = new PrintStream(new BufferedOutputStream(new FileOutputStream(classFile)))) {
             stream.println("package view2;\n" +
@@ -120,8 +159,8 @@ public final class Tool {
 
             stream.println("public class TmpRow implements Tmp{");
             stringProperties.forEach(s -> stream.format("private final StringProperty %s = new SimpleStringProperty(); ", s));
-            intProperties.forEach(i -> stream.format("private final IntegerProperty %s = new IntegerProperty(); ", i));
-            doubleProperties.forEach(d -> stream.format("private final DoubleProperty %s = new DoubleProperty(); ", d));
+            intProperties.forEach(i -> stream.format("private final IntegerProperty %s = new SimpleIntegerProperty(); ", i));
+            doubleProperties.forEach(d -> stream.format("private final DoubleProperty %s = new SimpleDoubleProperty(); ", d));
 
             stream.println("private static String transfer(String name) {\n" +
                     "        return Tool.transfer(name);\n" +
@@ -160,6 +199,8 @@ public final class Tool {
                     "");
 
             stringProperties.forEach(s -> stream.format("public StringProperty %sProperty() { return %s; }", s, s));
+            intProperties.forEach(s -> stream.format("public IntegerProperty %sProperty() { return %s; }", s, s));
+            doubleProperties.forEach(s -> stream.format("public DoubleProperty %sProperty() { return %s; }", s, s));
 
             stream.println("}");
             stream.flush();
@@ -173,9 +214,24 @@ public final class Tool {
             Class.forName("view2.TmpRow");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-            return false;
+            System.exit(-1);
+//            return false;
         }
+        createClassFlag = true;
         return true;
     }
+
+    public static Tmp createRow(Data data) {
+        try {
+            Class<?> aClass = Class.forName("view2.TmpRow");
+            Constructor<?> declaredConstructor = aClass.getDeclaredConstructor(Data.class);
+            return (Tmp) declaredConstructor.newInstance(data);
+        } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
 
 }

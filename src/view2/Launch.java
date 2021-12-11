@@ -25,11 +25,13 @@ import util.Holder;
 import view.TableRow;
 
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 
 public class Launch extends Application {
@@ -228,7 +230,7 @@ public class Launch extends Application {
 
             // 创建图表的相关操作
             {
-                TableView<TableRow> tableRowTableView = initTableView();
+                TableView<Tmp> tableRowTableView = initTableView();
                 viewPane.setCenter(tableRowTableView);
                 // 稍稍设置一下相关的图形参数吧，让它好看点
                 tableRowTableView.setPadding(new Insets(20));
@@ -269,10 +271,12 @@ public class Launch extends Application {
         return tabPane;
     }
 
+    private static boolean createTmpRowClassFlag = false;
+
     @SuppressWarnings("DeprecatedIsStillUsed")
     @Deprecated
-    private static TableView<TableRow> initTableView() {
-        TableView<TableRow> table = new TableView<>();
+    private static TableView<Tmp> initTableView() {
+        TableView<Tmp> table = new TableView<>();
         table.setPrefSize(560, 500);
         table.setTableMenuButtonVisible(true);
 
@@ -280,36 +284,16 @@ public class Launch extends Application {
         final ToIntFunction<String> widthSupplier = str -> 80;
 
         // 根据列名设置该列的相关信息
-        final Function<String, TableColumn<TableRow, String>> normalColGenerator =
+        final Function<String, TableColumn<Tmp, String>> normalColGenerator =
                 s -> {
-                    final TableColumn<TableRow, String> col = new TableColumn<>(s);
+                    final TableColumn<Tmp, String> col = new TableColumn<>(s);
                     col.setCellValueFactory(new PropertyValueFactory<>(s));
                     col.setPrefWidth(widthSupplier.applyAsInt(s));
                     return col;
                 };
 
         // Java 风格的变量名变化。
-        final Function<String, String> strMap = s -> {
-            char[] cs = s.toCharArray();
-            StringBuilder builder = new StringBuilder();
-            boolean flag = false;
-            for (char c : cs) {
-                if (c == '_') {
-                    flag = true;
-                    continue;
-                }
-                if (!flag) {
-                    builder.append(c);
-                } else {
-                    if (c >= 'a' && c <= 'z')
-                        builder.append((char)(c + 'A' - 'a'));
-                    else
-                        builder.append(c);
-                }
-                flag = false;
-            }
-            return builder.toString();
-        };
+        final Function<String, String> strMap = Tool::transferReverse;
 
         // 获取列名及各行信息
         //noinspection ConstantConditions
@@ -320,6 +304,49 @@ public class Launch extends Application {
         }
         // 新版本代码
         FileController fileData = Controller.instance.getFileData(Paths.get("res", "file", "owid-covid-data.csv").toFile());
+        if (!createTmpRowClassFlag) {
+            final Predicate<String> intPropertyColumnPredicate = s -> {
+                if (s.endsWith("Cases"))
+                    return true;
+                if (s.endsWith("Deaths"))
+                    return true;
+                if (s.equals("population"))
+                    return true;
+                if (s.endsWith("Tests")) {
+                    return true;
+                }
+                if (s.endsWith("Admissions"))
+                    return true;
+                if (s.endsWith("Patients"))
+                    return true;
+                if (s.endsWith("Vaccinations"))
+                    return true;
+                return false;
+            };
+            final Predicate<String> doublePropertyColumnPredicate = s -> {
+                if (s.endsWith("Rate"))
+                    return true;
+                if (s.contains("Per"))
+                    return true;
+                if (s.endsWith("Smoothed"))
+                    return true;
+                if (s.endsWith("Density"))
+                    return true;
+                return false;
+            };
+            List<String> ints = new ArrayList<>();
+            List<String> doubles = new ArrayList<>();
+            List<String> strings = new ArrayList<>();
+            fileData.basicListColName.stream().map(Tool::transferReverse).forEach(f -> {
+                if (intPropertyColumnPredicate.test(f))
+                    ints.add(f);
+                else if (doublePropertyColumnPredicate.test(f))
+                    doubles.add(f);
+                else
+                    strings.add(f);
+            });
+            Tool.createClass(strings, ints, doubles);
+        }
         List<Data> allData = fileData.higherList;
         Holder<List<String>> holder = new Holder<>();
         holder.obj = fileData.higherListColName;
@@ -327,12 +354,20 @@ public class Launch extends Application {
         // 创建各列信息
         holder.obj.forEach(s -> table.getColumns().add(strMap.andThen(normalColGenerator).apply(s)));
 
-        // 创建数据集对象
-        ObservableList<TableRow> tableData = FXCollections.observableArrayList();
-        table.setItems(tableData);
+        // 旧版数据集对象设计！
+        if (false) {
+            // 创建数据集对象
+//            ObservableList<TableRow> tableData = FXCollections.observableArrayList();
+//            table.setItems(tableData);
+//
+//            // 将各值放入表格中
+//            allData.stream().map(TableRow::new).forEach(tableData::add);
+        } else {
+            ObservableList<Tmp> tableData = FXCollections.observableArrayList();
+            table.setItems(tableData);
 
-        // 将各值放入表格中
-        allData.stream().map(TableRow::new).forEach(tableData::add);
+            allData.stream().map(Tool::createRow).forEach(tableData::add);
+        }
 
         return table;
     }

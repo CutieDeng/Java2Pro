@@ -39,7 +39,6 @@ public class FileController {
                     "location",
                     "population",
                     "population_density",
-                    "stringency_index",
                     "life_expectancy",
                     "median_age",
                     "human_development_index",
