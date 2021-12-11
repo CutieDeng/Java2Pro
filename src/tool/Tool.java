@@ -7,11 +7,14 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import util.Holder;
 
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -83,6 +86,96 @@ public final class Tool {
             if (e.getCode() == KeyCode.ENTER)
                 button.fire();
         });
+    }
+
+    public static String transfer(String name) {
+        char[] chars = name.toCharArray();
+        StringBuilder ans = new StringBuilder();
+        for (char c : chars) {
+            if (c >= 'A' && c <= 'Z')
+                ans.append(' ').append((char)(c + 'a' - 'A'));
+            else
+                ans.append(c);
+        }
+        return ans.toString();
+    }
+
+    public static void main(String[] args) {
+        createClass(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+    }
+
+    public static boolean createClass(List<String> stringProperties, List<String> intProperties, List<String> doubleProperties) {
+        final File classFile = Paths.get("src", "view2", "TmpRow.java").toFile();
+        try (PrintStream stream = new PrintStream(new BufferedOutputStream(new FileOutputStream(classFile)))) {
+            stream.println("package view2;\n" +
+                    "\n" +
+                    "import data.Data;\n" +
+                    "import javafx.beans.property.*;\n" +
+                    "import tool.Tool;\n" +
+                    "\n" +
+                    "import java.lang.reflect.Field;\n" +
+                    "import java.lang.reflect.InvocationTargetException;\n" +
+                    "import java.lang.reflect.Method;\n" +
+                    "import java.util.Arrays;");
+
+            stream.println("public class TmpRow implements Tmp{");
+            stringProperties.forEach(s -> stream.format("private final StringProperty %s = new SimpleStringProperty(); ", s));
+            intProperties.forEach(i -> stream.format("private final IntegerProperty %s = new IntegerProperty(); ", i));
+            doubleProperties.forEach(d -> stream.format("private final DoubleProperty %s = new DoubleProperty(); ", d));
+
+            stream.println("private static String transfer(String name) {\n" +
+                    "        return Tool.transfer(name);\n" +
+                    "    }");
+
+            stream.println("public TmpRow(Data data) {\n" +
+                    "        Class<?> subClass = this.getClass();\n" +
+                    "\n" +
+                    "        Field[] declaredFields = subClass.getDeclaredFields();\n" +
+                    "\n" +
+                    "        Arrays.stream(declaredFields).forEach(p -> {\n" +
+                    "            String fetch = data.fetch(transfer(p.getName()));\n" +
+                    "            if (p.getType() == IntegerProperty.class) {\n" +
+                    "                int f = fetch.length() > 0 ? (int) Double.parseDouble(fetch) : 0;\n" +
+                    "                try {\n" +
+                    "                    Method set = IntegerProperty.class.getMethod(\"set\", int.class);\n" +
+                    "                    set.invoke(p.get(this), f);\n" +
+                    "                } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ignored) {\n" +
+                    "                }\n" +
+                    "            } else if (p.getType() == DoubleProperty.class) {\n" +
+                    "                int f = fetch.length() > 0 ? (int) Double.parseDouble(fetch) : 0;\n" +
+                    "                try {\n" +
+                    "                    Method set = DoubleProperty.class.getMethod(\"set\", double.class);\n" +
+                    "                    set.invoke(p.get(this), f);\n" +
+                    "                } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ignored) {\n" +
+                    "                }\n" +
+                    "            } else if (p.getType() == StringProperty.class) {\n" +
+                    "                try {\n" +
+                    "                    Method set = StringProperty.class.getMethod(\"setValue\", String.class);\n" +
+                    "                    set.invoke(p.get(this), fetch);\n" +
+                    "                } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException ignored) {\n" +
+                    "                }\n" +
+                    "            }\n" +
+                    "        });\n" +
+                    "    }\n" +
+                    "");
+
+            stringProperties.forEach(s -> stream.format("public StringProperty %sProperty() { return %s; }", s, s));
+
+            stream.println("}");
+            stream.flush();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        compiler.run(null, null, null, "src/view2/TmpRow.java");
+        try {
+            Class.forName("view2.TmpRow");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
 }

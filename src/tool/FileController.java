@@ -19,7 +19,7 @@ public class FileController {
 
         Holder<List<String>> holder = new Holder<>();
         basicList = Tool.readDataFile(dataFile, holder);
-        basicListColName = holder.obj;
+        basicListColName = holder.obj.stream().filter(s -> !s.contains("smoothed")).collect(Collectors.toList());
 
         higherList = new ArrayList<>();
         // 二次筛选！
