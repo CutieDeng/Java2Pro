@@ -1,5 +1,7 @@
 package tool;
 
+import data.Data;
+
 import java.util.*;
 
 public class TabArgumentMap implements Map<String, Object> {
@@ -78,7 +80,7 @@ public class TabArgumentMap implements Map<String, Object> {
         return this;
     }
 
-    public TabArgumentMap rows(List<String> rows) {
+    public TabArgumentMap rows(List<Data> rows) {
         put(rows);
         return this;
     }

@@ -223,7 +223,8 @@ public class Launch extends Application {
 
             // 创建图表的相关操作
             {
-                TableView<Tmp> tableRowTableView = initTableView();
+                //noinspection unchecked
+                TableView<Tmp> tableRowTableView = initTableView((List<String>)map.get("colNames"), (List<Data>) map.get("rows"));
                 viewPane.setCenter(tableRowTableView);
                 // 稍稍设置一下相关的图形参数吧，让它好看点
                 tableRowTableView.setPadding(new Insets(20));
@@ -245,10 +246,30 @@ public class Launch extends Application {
         return returnTab;
     };
 
+    private static TableView<Tmp> initTableView(List<String> colNames, List<Data> datas) {
+        TableView<Tmp> view = new TableView<>();
+        view.setTableMenuButtonVisible(true);
+
+        final ToIntFunction<String> widthSupplier = str -> 80;
+
+        final Function<String, TableColumn<Tmp, String>> colGenerator =
+                s -> {
+                    final TableColumn<Tmp, String> col = new TableColumn<>(s);
+                    col.setCellValueFactory(new PropertyValueFactory<>(s));
+                    col.setPrefWidth(widthSupplier.applyAsInt(s));
+                    return col;
+                };
+        colNames.forEach(cn -> view.getColumns().add(colGenerator.apply(Tool.transferReverse(cn))));
+        datas.stream().map(Tool::createRow).forEach(r -> view.getItems().add(r));
+        return view;
+    }
+
     private static TabPane initTabPane(Tab... tabs) {
         TabPane tabPane = new TabPane(tabs);
         if (tabs.length == 0) {
-            tabPane.getTabs().addAll(tabSupplier.apply(new TabArgumentMap().type(DisplayType.TABLE)));
+            FileController fileData = Controller.instance.getFileData(Paths.get("res", "file", "owid-covid-data.csv").toFile());
+            tabPane.getTabs().addAll(tabSupplier.apply(new TabArgumentMap().type(DisplayType.TABLE)
+                    .colNames(fileData.basicListColName).rows(fileData.basicList)));
         }
         return tabPane;
     }
