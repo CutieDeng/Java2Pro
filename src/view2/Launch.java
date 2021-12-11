@@ -5,13 +5,12 @@ import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
@@ -23,21 +22,16 @@ import javafx.util.Duration;
 import tool.*;
 import util.Holder;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 
-@SuppressWarnings("Convert2Diamond")
+@SuppressWarnings({"RedundantIfStatement", "unused"})
 public class Launch extends Application {
 
     /**
@@ -87,7 +81,6 @@ public class Launch extends Application {
 
         // 将对提示框的内容设置方法上传到全局信息，便于其他方法进行调用。
         // 补充：新增了多线程的并发支持。
-        //noinspection Convert2Diamond
         tipNotify = new Consumer<String>() {
             @Override synchronized
             public void accept(String s) {
@@ -188,7 +181,7 @@ public class Launch extends Application {
         //设置table页面
         if (map.getOrDefault("type", DisplayType.TABLE) == DisplayType.TABLE) {
 
-            final Holder<Consumer<String>> holder = new Holder<>();
+            final Holder<Consumer<String>> searchBoxActionHolder = new Holder<>();
 
             // 创建搜索框等相关操作
             {
@@ -208,7 +201,7 @@ public class Launch extends Application {
                         (double )map.getOrDefault("searchPrefHeight", 20.));
 
                 // 搜索会发生的事情
-                final Consumer<String> searchAction = (searchContent) -> holder.obj.accept(searchContent);
+                final Consumer<String> searchAction = (searchContent) -> searchBoxActionHolder.obj.accept(searchContent);
 
                 // 增添提示信息
                 searchField.setPromptText(map.getOrDefault("searchPromptText", "请输入关键词").toString());
@@ -240,12 +233,9 @@ public class Launch extends Application {
                 datePicker.setEditable(false);
                 searchBox.getChildren().add(datePicker);
 
-                datePicker.valueProperty().addListener(new ChangeListener<LocalDate>() {
-                    @Override
-                    public void changed(ObservableValue<? extends LocalDate> observable, LocalDate oldValue, LocalDate newValue) {
-                        String date = newValue.format(DateTimeFormatter.ISO_DATE);
-                        searchField.setText(date);
-                    }
+                datePicker.valueProperty().addListener((observable, oldValue, newValue) -> {
+                    String date = newValue.format(DateTimeFormatter.ISO_DATE);
+                    searchField.setText(date);
                 });
 
 
@@ -254,47 +244,30 @@ public class Launch extends Application {
 
             // 创建图表的相关操作
             {
-                //noinspection unchecked
+                @SuppressWarnings("unchecked")
                 TableView<Tmp> tableRowTableView = initTableView((List<String>)map.get("colNames"), (List<Data>) map.get("rows"));
                 viewPane.setCenter(tableRowTableView);
                 // 稍稍设置一下相关的图形参数吧，让它好看点
                 tableRowTableView.setPadding(new Insets(20));
 
                 // 设置搜索会发生的事情
+                @SuppressWarnings("unchecked") final List<Data> rows = (List<Data>) map.get("rows");
 
-                holder.obj = (searchText) -> {
+                searchBoxActionHolder.obj = (searchText) -> {
                     ObservableList<Tmp> searchList = FXCollections.observableArrayList();
 
-                    List<Data> searchData = (List<Data>) map.get("rows");
-
-                    // 小修小补...
-                    if (false) {
-                        searchData.stream().map(Tool::createRow)
-                                .filter(row -> {
-                                    Map<String, String> searchMap = Tool.getSearchProperties(row);
-                                    return searchText.equals(searchMap.get("location")) || searchText.equals(searchMap.get("iso"))
-                                            || searchText.equals(searchMap.get("date"));
-                                })
-                                .forEach(searchList::add);
-                    } else {
-                        searchData.stream().filter(d -> {
-                            if (d.fetch("location").contains(searchText))
-                                return true;
-                            if (d.fetch("iso code").contains(searchText))
-                                return true;
-                            if (d.fetch("date").equals(searchText))
-                                return true;
-                            return false;
-                        }).map(Tool::createRow).forEach(searchList::add);
-                    }
+                    rows.stream().filter(d -> {
+                        if (d.fetch("location").contains(searchText))
+                            return true;
+                        if (d.fetch("iso code").contains(searchText))
+                            return true;
+                        if (d.fetch("date").equals(searchText))
+                            return true;
+                        return false;
+                    }).map(Tool::createRow).forEach(searchList::add);
 
                     tableRowTableView.setItems(searchList);
                 };
-
-
-
-
-
 
             }
 
@@ -302,13 +275,88 @@ public class Launch extends Application {
         //设置graph页面
         else if (map.get("type") == DisplayType.GRAPH){
 
-            // todo: 创建一个合适的图像以显示相关信息。
-            // 我们会在创建图像的选单中就确定创建什么样的表格信息，不必担心不知道是什么样的表单。
+            // 大工程hhh, 怎么做图呢？
 
-//            VBox choiceBox = new VBox();
-//            Label choice1 = new Label("Area Chart");
-//            Label choice2 = new Label("Bar Chart");
-//            Label choice3 = new Label("Pie Chart");
+            // 先规约一个图的细选择吧。。。
+            {
+                BorderPane chartPane = new BorderPane();
+                viewPane.setCenter(chartPane);
+                // First step: 获取将要创建的图表类型
+                switch ((GraphType) map.get("graphType")) {
+                    case PIE_CHART:
+                        break;
+                    case BUBBLE_CHART:
+                        break;
+                    case LINE_CHART:
+
+                        ObservableList<String> dateList = FXCollections.observableArrayList();
+                        ObservableList<XYChart.Series<String, Number>> countriesList = FXCollections.observableArrayList();
+                        Map<String, XYChart.Series<String, Number>> splitMap = new HashMap<>();
+
+                        Holder<Consumer<Void>> initPerform = new Holder<>();
+                        initPerform.obj = (V) -> {};
+
+                        {
+                            Axis<String> date = new CategoryAxis(dateList);
+
+                            Axis<Number> values = new NumberAxis();
+
+                            LineChart<String, Number> chart = new LineChart<>(date, values, countriesList);
+                            chart.setCreateSymbols(false);
+
+                            chartPane.setCenter(chart);
+
+                            String mainColName = (String ) map.get("major");
+                            String minorColName = (String ) map.get("minor");
+                            String valueColumn = (String ) map.get("value");
+
+                            @SuppressWarnings("unchecked")
+                            TreeMap<String, List<Data>> dateToData = new TreeMap<>((Comparator<? super String>) map.getOrDefault("dateComparator", null));
+
+                            @SuppressWarnings("unchecked")
+                            List<Data> rows = (List<Data>) map.get("rows");
+
+                            rows.forEach(r -> {
+                                if (!dateToData.containsKey(r.fetch(minorColName))) {
+                                    dateToData.put(r.fetch(minorColName), new ArrayList<>());
+                                }
+                                dateToData.get(r.fetch(minorColName)).add(r);
+                            });
+
+                            Iterator<Map.Entry<String, List<Data>>> iterator = dateToData.entrySet().iterator();
+
+                            Timeline animationOnce = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
+                                if (iterator.hasNext()) {
+                                    Map.Entry<String, List<Data>> next = iterator.next();
+                                    dateList.add(next.getKey());
+                                    next.getValue().forEach(r -> {
+                                        if (!splitMap.containsKey(r.fetch(mainColName))) {
+                                            XYChart.Series<String, Number> countrySeries = new XYChart.Series<>();
+                                            countrySeries.setName(r.fetch(mainColName));
+                                            splitMap.put(r.fetch(mainColName), countrySeries);
+                                            countriesList.add(countrySeries);
+                                        }
+                                        splitMap.get(r.fetch(mainColName)).getData().add(new XYChart.Data<>(r.fetch(minorColName),
+                                                (Double.parseDouble("0" + r.fetch(valueColumn)))
+                                        ));
+                                    });
+                                }
+                            }));
+
+                            animationOnce.setAutoReverse(false);
+                            animationOnce.setCycleCount(dateToData.size());
+
+                            // 为原来的初始化操作新增一个动作！现在初始化的过程将会播放动画！
+                            initPerform.obj = initPerform.obj.andThen((V) -> animationOnce.play());
+                        }
+
+
+                        initPerform.obj.accept(null);
+
+                        break;
+                }
+            }
+
         }
 
         return returnTab;
@@ -348,7 +396,8 @@ public class Launch extends Application {
 
     private static boolean createTmpRowClassFlag = false;
 
-    @SuppressWarnings("DeprecatedIsStillUsed")
+    // 经过艰难的努力，该方法终于被弃用啦～
+
     @Deprecated
     private static TableView<Tmp> initTableView() {
         TableView<Tmp> table = new TableView<>();
@@ -371,13 +420,6 @@ public class Launch extends Application {
         final Function<String, String> strMap = Tool::transferReverse;
 
         // 获取列名及各行信息
-        //noinspection ConstantConditions
-        if (false) {
-            // 旧版本代码！
-            Holder<List<String>> holder = new Holder<>();
-            List<Data> allData = Tool.readDataFile(Paths.get("res", "file", "owid-covid-data.csv").toFile(), holder);
-        }
-        // 新版本代码
         FileController fileData = Controller.instance.getFileData(Paths.get("res", "file", "owid-covid-data.csv").toFile());
         if (!createTmpRowClassFlag) {
             final Predicate<String> intPropertyColumnPredicate = s -> {
@@ -430,20 +472,10 @@ public class Launch extends Application {
         // 创建各列信息
         holder.obj.forEach(s -> table.getColumns().add(strMap.andThen(normalColGenerator).apply(s)));
 
-        // 旧版数据集对象设计！
-        if (false) {
-            // 创建数据集对象
-//            ObservableList<TableRow> tableData = FXCollections.observableArrayList();
-//            table.setItems(tableData);
-//
-//            // 将各值放入表格中
-//            allData.stream().map(TableRow::new).forEach(tableData::add);
-        } else {
-            ObservableList<Tmp> tableData = FXCollections.observableArrayList();
-            table.setItems(tableData);
+        ObservableList<Tmp> tableData = FXCollections.observableArrayList();
+        table.setItems(tableData);
 
-            allData.stream().map(Tool::createRow).forEach(tableData::add);
-        }
+        allData.stream().map(Tool::createRow).forEach(tableData::add);
 
         return table;
     }
@@ -514,13 +546,6 @@ public class Launch extends Application {
                 stage.close();
             };
 
-            // [Error]: 请不要对窗口层次监听与窗口无关的快捷键！
-            //设置Enter快捷键
-//            stageScene.setOnKeyPressed(e -> {
-//                if (e.getCode() == KeyCode.ENTER)
-//                    tableAction.accept(new Object());
-//            });
-
             //给apply按钮设置action
             Button applyButton = (Button) setNamePane.lookupButton(ButtonType.APPLY);
             // 设置允许聚焦选项
@@ -556,11 +581,15 @@ public class Launch extends Application {
             stage.show();
 
             final Consumer<Object> graphAction = (o) -> {
+
+                final FileController lists = Controller.instance.getFileData(Paths.get("res", "file", "owid-covid-data.csv").toFile());
+
                 Map<String, Object> map;
                 if (!name.getText().equals("")) {
                     map = new TabArgumentMap().type(DisplayType.GRAPH).title(name.getText());
                 }
-                else map = new TabArgumentMap().type(DisplayType.GRAPH);
+                else map = new TabArgumentMap().type(DisplayType.GRAPH).colNames(lists.basicListColName).rows(lists.basicList)
+                        .major("location").minor("date").value("total cases").graphType(GraphType.LINE_CHART);
 
                 Tab apply = tabSupplier.apply(map);
                 TabPane tabPane = (TabPane) storeMap.get("tabPane");

@@ -85,6 +85,26 @@ public class TabArgumentMap implements Map<String, Object> {
         return this;
     }
 
+    public TabArgumentMap graphType(GraphType type) {
+        put(type);
+        return this;
+    }
+
+    public TabArgumentMap major(String majorColumn) {
+        put(majorColumn);
+        return this;
+    }
+
+    public TabArgumentMap minor(String minorColumn) {
+        put(minorColumn);
+        return this;
+    }
+
+    public TabArgumentMap value(String showColumn) {
+        put(showColumn);
+        return this;
+    }
+
 
 
 

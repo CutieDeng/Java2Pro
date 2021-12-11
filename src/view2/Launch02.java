@@ -5,7 +5,8 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
-import javafx.beans.property.DoubleProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
@@ -47,7 +48,8 @@ public class Launch02 extends Application {
     }
 
     private static LineChart<String, Number> method2(String valueName, List<Data> dataList, EnclosedObject<KeyFrame> enclosedObject) {
-        CategoryAxis dates = new CategoryAxis();
+        ObservableList<String> objects = FXCollections.observableArrayList();
+        CategoryAxis dates = new CategoryAxis(objects);
         dates.setLabel("时间");
 
         NumberAxis values = new NumberAxis();
@@ -67,10 +69,14 @@ public class Launch02 extends Application {
 
         Iterator<String> i = timeStamp.keySet().iterator();
 
-        KeyFrame toFrame = new KeyFrame(Duration.millis(1000), e -> {
+        timingChart.setCreateSymbols(false);
+
+        enclosedObject.object = new KeyFrame(Duration.millis(600), e -> {
             if (i.hasNext()) {
-                ArrayList<Data> data = timeStamp.get(i.next());
-                data.stream().forEach(d -> {
+                String next = i.next();
+                ArrayList<Data> data = timeStamp.get(next);
+                objects.add(next);
+                data.forEach(d -> {
                     if (!countryMap.containsKey(d.fetch("iso code"))) {
                         Series<String, Number> nS = new Series<>();
                         nS.setName(d.fetch("iso code"));
@@ -83,8 +89,6 @@ public class Launch02 extends Application {
                 });
             }
         });
-
-        enclosedObject.object = toFrame;
 
         return timingChart;
     }
@@ -102,11 +106,13 @@ public class Launch02 extends Application {
             map.get(d.fetch("iso code")).add(d);
                 }, Map::putAll);
         res.forEach((c, l) -> {
-            final Series countryInfo = new Series<String, Number>();
+            final Series<String, Number> countryInfo = new Series<String, Number>();
             countryInfo.setName(c);
             l.stream().map(d -> new XYChart.Data<>(d.fetch("date"),
-                    d.fetch(valueName).length() > 0 ? Double.parseDouble(d.fetch(valueName)) : 0))
-                    .forEach(countryInfo.getData()::add);
+                    d.fetch(valueName).length() > 0 ? (Number)Double.parseDouble(d.fetch(valueName)) : 0))
+                    .forEach(t -> {
+                        countryInfo.getData().add(t);
+                    });
             timingChart.getData().add(countryInfo);
 
         });
