@@ -346,6 +346,7 @@ public class Launch extends Application {
                     strings.add(f);
             });
             Tool.createClass(strings, ints, doubles);
+            createTmpRowClassFlag = true;
         }
         List<Data> allData = fileData.higherList;
         Holder<List<String>> holder = new Holder<>();
