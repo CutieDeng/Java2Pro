@@ -21,6 +21,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -230,6 +231,18 @@ public final class Tool {
             e.printStackTrace();
             return null;
         }
+    }
+
+    /**
+     *
+     * @param tmp 传入一个tmp对象
+     * @return 返回一个Map, 规定：不能返回null
+     *          map里有3个key: location, iso, date
+     *          其中date的格式为“xxxx-xx-xx”
+     *
+     */
+    public static Map<String, String> getSearchProperties(Tmp tmp) {
+        return null;
     }
 
 

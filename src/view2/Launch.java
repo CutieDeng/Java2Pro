@@ -5,6 +5,8 @@ import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -21,7 +23,11 @@ import javafx.util.Duration;
 import tool.*;
 import util.Holder;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -229,6 +235,20 @@ public class Launch extends Application {
                 searchField.setOnAction(e -> searchAction.accept(searchField.getText()));
                 searchConfirmButton.setOnAction(e -> searchAction.accept(searchField.getText()));
 
+                //todo: 还想不到好的GUI设计，暂时这样呈现，有点点丑
+                DatePicker datePicker = new DatePicker(LocalDate.now());
+                datePicker.setEditable(false);
+                searchBox.getChildren().add(datePicker);
+
+                datePicker.valueProperty().addListener(new ChangeListener<LocalDate>() {
+                    @Override
+                    public void changed(ObservableValue<? extends LocalDate> observable, LocalDate oldValue, LocalDate newValue) {
+                        String date = newValue.format(DateTimeFormatter.ISO_DATE);
+                        searchField.setText(date);
+                    }
+                });
+
+
             }
 
 
@@ -241,6 +261,28 @@ public class Launch extends Application {
                 tableRowTableView.setPadding(new Insets(20));
 
                 // 设置搜索会发生的事情
+
+                holder.obj = (searchText) -> {
+                    ObservableList<Tmp> searchList = FXCollections.observableArrayList();
+
+                    List<Data> searchData = (List<Data>) map.get("rows");
+
+                    //todo: need to be tested
+                    searchData.stream().map(Tool::createRow)
+                        .filter(row -> {
+                            Map<String, String> searchMap = Tool.getSearchProperties(row);
+                            return searchText.equals(searchMap.get("location")) || searchText.equals(searchMap.get("iso"))
+                                    || searchText.equals(searchMap.get("date"));
+                        })
+                        .forEach(searchList::add);
+
+                    tableRowTableView.setItems(searchList);
+                };
+
+
+
+
+
 
             }
 
@@ -274,7 +316,11 @@ public class Launch extends Application {
                     return col;
                 };
         colNames.forEach(cn -> view.getColumns().add(colGenerator.apply(Tool.transferReverse(cn))));
-        datas.stream().map(Tool::createRow).forEach(r -> view.getItems().add(r));
+
+//        datas.stream().map(Tool::createRow).forEach(view.getItems()::add);
+        ObservableList<Tmp> dataList = FXCollections.observableArrayList();
+        datas.stream().map(Tool::createRow).forEach(dataList::add);
+        view.setItems(dataList);
         return view;
     }
 
