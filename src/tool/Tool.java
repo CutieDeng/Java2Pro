@@ -158,9 +158,9 @@ public final class Tool {
                     "import java.util.Arrays;");
 
             stream.println("public class TmpRow implements Tmp{");
-            stringProperties.forEach(s -> stream.format("private final StringProperty %s = new SimpleStringProperty(); ", s));
-            intProperties.forEach(i -> stream.format("private final IntegerProperty %s = new SimpleIntegerProperty(); ", i));
-            doubleProperties.forEach(d -> stream.format("private final DoubleProperty %s = new SimpleDoubleProperty(); ", d));
+            stringProperties.forEach(s -> stream.format("private final StringProperty %s = new SimpleStringProperty(); %n", s));
+            intProperties.forEach(i -> stream.format("private final IntegerProperty %s = new SimpleIntegerProperty(); %n", i));
+            doubleProperties.forEach(d -> stream.format("private final DoubleProperty %s = new SimpleDoubleProperty(); %n", d));
 
             stream.println("private static String transfer(String name) {\n" +
                     "        return Tool.transfer(name);\n" +
@@ -198,9 +198,9 @@ public final class Tool {
                     "    }\n" +
                     "");
 
-            stringProperties.forEach(s -> stream.format("public StringProperty %sProperty() { return %s; }", s, s));
-            intProperties.forEach(s -> stream.format("public IntegerProperty %sProperty() { return %s; }", s, s));
-            doubleProperties.forEach(s -> stream.format("public DoubleProperty %sProperty() { return %s; }", s, s));
+            stringProperties.forEach(s -> stream.format("public StringProperty %sProperty() { return %s; }%n", s, s));
+            intProperties.forEach(s -> stream.format("public IntegerProperty %sProperty() { return %s; }%n", s, s));
+            doubleProperties.forEach(s -> stream.format("public DoubleProperty %sProperty() { return %s; }%n", s, s));
 
             stream.println("}");
             stream.flush();
