@@ -400,7 +400,6 @@ public class Launch extends Application {
                 };
         colNames.forEach(cn -> view.getColumns().add(colGenerator.apply(Tool.transferReverse(cn))));
 
-//        datas.stream().map(Tool::createRow).forEach(view.getItems()::add);
         ObservableList<Tmp> dataList = FXCollections.observableArrayList();
         datas.stream().map(Tool::createRow).forEach(dataList::add);
         view.setItems(dataList);
@@ -420,7 +419,6 @@ public class Launch extends Application {
     private static boolean createTmpRowClassFlag = false;
 
     // 经过艰难的努力，该方法终于被弃用啦～
-
     @Deprecated
     private static TableView<Tmp> initTableView() {
         TableView<Tmp> table = new TableView<>();
@@ -534,6 +532,38 @@ public class Launch extends Application {
             // 快捷键为 Alt + T, means optional to see tip box.
             KeyCombination combination = new KeyCodeCombination(KeyCode.T, KeyCombination.ALT_DOWN);
             accelerateScene.getAccelerators().put(combination, displayOption::fire);
+        }
+
+        {
+            // 现在让我们来创建一个更加合情合理的表格创建方式吧！
+            {
+                // 首先，让我们试着创建部分数据的图表信息～
+                MenuItem partial = new MenuItem("区域信息可视化");
+                partial.setDisable(true);
+                MenuItem table = new MenuItem("表格");
+                MenuItem pieGraph = new MenuItem("饼图");
+                MenuItem bubbleGraph = new MenuItem("条形图");
+
+                menuData.getItems().addAll(partial, table, pieGraph, bubbleGraph, new SeparatorMenuItem());
+            }
+            {
+                // 现在，让我们试着取出所有数据，创建一个大表哥吧！
+                MenuItem all = new MenuItem("疫情总数据可视化");
+                all.setDisable(true);
+                MenuItem table = new MenuItem("表格");
+                MenuItem pieGraph = new MenuItem("饼图");
+                MenuItem bubbleGraph = new MenuItem("条形图");
+                MenuItem chartGraph = new MenuItem("折线图");
+
+                menuData.getItems().addAll(all, table, pieGraph, bubbleGraph, chartGraph, new SeparatorMenuItem());
+            }
+        }
+
+        {
+            // 其实我建议禁用之前的操作的...
+            MenuItem ban = new MenuItem("旧版选项入口");
+            ban.setDisable(true);
+            menuData.getItems().add(ban);
         }
 
         MenuItem tableMenu = new MenuItem("表");
