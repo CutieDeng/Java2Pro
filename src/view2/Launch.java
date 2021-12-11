@@ -248,6 +248,8 @@ public class Launch extends Application {
                     }
                 });
 
+                datePicker.setOnAction(e -> searchAction.accept(searchField.getText()));
+
 
             }
 
@@ -283,6 +285,8 @@ public class Launch extends Application {
                             if (d.fetch("iso code").contains(searchText))
                                 return true;
                             if (d.fetch("date").equals(searchText))
+                                return true;
+                            if (d.fetch("continent").equals(searchText))
                                 return true;
                             return false;
                         }).map(Tool::createRow).forEach(searchList::add);
