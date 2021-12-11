@@ -7,8 +7,6 @@ import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -22,7 +20,6 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import tool.*;
 import util.Holder;
-import view.TableRow;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -34,6 +31,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 
+@SuppressWarnings("Convert2Diamond")
 public class Launch extends Application {
 
     /**
@@ -83,6 +81,7 @@ public class Launch extends Application {
 
         // 将对提示框的内容设置方法上传到全局信息，便于其他方法进行调用。
         // 补充：新增了多线程的并发支持。
+        //noinspection Convert2Diamond
         tipNotify = new Consumer<String>() {
             @Override synchronized
             public void accept(String s) {
@@ -100,23 +99,17 @@ public class Launch extends Application {
         Holder<Boolean> isDeath = new Holder<>(); isDeath.obj = false;
 
         MenuItem displayTip = new MenuItem("显示/隐藏提示框");
-        //noinspection Convert2Lambda
-        displayTip.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-//            synchronized
-            public void handle(ActionEvent event) {
-                isDeath.obj = !isDeath.obj;
-                BorderPane root = (BorderPane) storeMap.get("root");
-                if (!isDeath.obj) {
-                    root.setBottom(tipBox);
-                    goLive.play();
-                }
-                else {
-                    goDeath.play();
-                    final Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(2.), e -> root.bottomProperty().set(null)));
-                    timeline.setCycleCount(1);
-                    timeline.play();
-                }
+        displayTip.setOnAction(event -> {
+            isDeath.obj = !isDeath.obj;
+            BorderPane root1 = (BorderPane) storeMap.get("root");
+            if (!isDeath.obj) {
+                root1.setBottom(tipBox);
+                goLive.play();
+            } else {
+                goDeath.play();
+                final Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(2.), e -> root1.bottomProperty().set(null)));
+                timeline.setCycleCount(1);
+                timeline.play();
             }
         });
         displayTip.setAccelerator(new KeyCodeCombination(KeyCode.T, KeyCombination.ALT_DOWN));
