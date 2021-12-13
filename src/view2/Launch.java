@@ -418,6 +418,20 @@ public class Launch extends Application {
             // 我们会在创建图像的选单中就确定创建什么样的表格信息，不必担心不知道是什么样的表单。
         }
 
+        returnTab.setTooltip(new Tooltip("这是一个 tooltip"));
+
+        // 提供一个重命名功能呗 qwq
+        {
+            // 创建表单啦 qwq
+            ContextMenu menu = new ContextMenu();
+            returnTab.setContextMenu(menu);
+
+            MenuItem renameItem = new MenuItem("重命名标签页 -- 暂不支持");
+            renameItem.setDisable(true);
+            menu.getItems().add(renameItem);
+
+        }
+
         return returnTab;
     };
 
@@ -567,6 +581,16 @@ public class Launch extends Application {
             // 快捷键为 Alt + T, means optional to see tip box.
             KeyCombination combination = new KeyCodeCombination(KeyCode.T, KeyCombination.ALT_DOWN);
             accelerateScene.getAccelerators().put(combination, displayOption::fire);
+
+            // 设置全屏操作
+            MenuItem fullOption = new MenuItem("进入/退出 全屏模式");
+            help.getItems().add(fullOption);
+
+            KeyCombination fullScreenKeyCombination = new KeyCodeCombination(KeyCode.F, KeyCombination.SHIFT_DOWN,
+                    KeyCombination.ALT_DOWN);
+            accelerateScene.getAccelerators().put(fullScreenKeyCombination, fullOption::fire);
+            //noinspection unchecked
+            fullOption.setOnAction(e -> ((Consumer<Void>) storeMap.get("flipTheFullScreen")).accept(null));
         }
 
         {
@@ -576,16 +600,22 @@ public class Launch extends Application {
                 MenuItem partial = new MenuItem("区域信息可视化");
                 partial.setDisable(true);
                 MenuItem table = new MenuItem("表格");
+
+                table.setOnAction(e -> createAbstractTable());
+
                 MenuItem pieGraph = new MenuItem("饼图");
                 MenuItem bubbleGraph = new MenuItem("条形图");
 
                 menuData.getItems().addAll(partial, table, pieGraph, bubbleGraph, new SeparatorMenuItem());
             }
             {
-                // 现在，让我们试着取出所有数据，创建一个大表哥吧！
+                // 现在，让我们试着取出所有数据，创建一个大表格吧！
                 MenuItem all = new MenuItem("疫情总数据可视化");
                 all.setDisable(true);
                 MenuItem table = new MenuItem("表格");
+
+                table.setOnAction(e -> createDetailsTable());
+
                 MenuItem pieGraph = new MenuItem("饼图");
                 MenuItem bubbleGraph = new MenuItem("条形图");
                 MenuItem chartGraph = new MenuItem("折线图");
@@ -618,7 +648,7 @@ public class Launch extends Application {
             stage.setScene(stageScene);
             stage.show();
 
-            final Consumer<Void> tableAction = (o) -> {
+            final Consumer<Void> tableAction = (v) -> {
                 Map<String, Object> map;
                 if (!name.getText().equals("")) {
                     map = new TabArgumentMap().title(name.getText()).type(DisplayType.TABLE);
@@ -686,13 +716,6 @@ public class Launch extends Application {
                 stage.close();
             };
 
-            // [Warning]: 请不要使用这样的方式设置快捷键
-//            //设置Enter快捷键
-//            stageScene.setOnKeyPressed(e -> {
-//                if (e.getCode() == KeyCode.ENTER)
-//                    graphAction.accept(new Object());
-//            });
-
             //给apply按钮设置action
             Button applyButton = (Button) setNamePane.lookupButton(ButtonType.APPLY);
             applyButton.setOnAction(e -> graphAction.accept(new Object()));
@@ -702,6 +725,70 @@ public class Launch extends Application {
         });
 
         return menuBar;
+    }
+
+    private static void createTable(@SuppressWarnings("SameParameterValue") String headerText, List<String> colNames, List<Data> rows) {
+        DialogPane setNamePane = new DialogPane();
+        setNamePane.setHeaderText(headerText);
+
+        TextField name = new TextField();
+
+        // 别忘了设置好看的弹出窗口嗷 qwq
+        setNamePane.setPadding(new Insets(20, 15, 20, 15));
+        name.setPadding(new Insets(15));
+
+        setNamePane.setContent(name);
+        setNamePane.getButtonTypes().add(ButtonType.CANCEL);
+        setNamePane.getButtonTypes().add(ButtonType.APPLY);
+
+        Scene stageScene = new Scene(setNamePane);
+        Stage stage = new Stage();
+        stage.setWidth(300);
+        stage.setTitle(headerText);
+        stage.setScene(stageScene);
+        stage.show();
+
+        final Consumer<Void> tableAction = (v) -> {
+            TabArgumentMap map = new TabArgumentMap().type(DisplayType.TABLE);
+            if (!name.getText().trim().equals(""))
+                map.title(name.getText());
+            map.colNames(colNames).rows(rows);
+            Tab apply = tabSupplier.apply(map);
+
+            // 全局唯一量啦啦啦，毫无设计模式的硬编码写法 qwq
+            final TabPane tabPane1 = (TabPane) storeMap.get("tabPane");
+
+            tabPane1.getTabs().add(apply);
+            tabPane1.getSelectionModel().select(apply);
+            stage.close();
+        };
+
+        //给apply按钮设置action
+        Button applyButton = (Button) setNamePane.lookupButton(ButtonType.APPLY);
+        // 设置允许聚焦选项
+        applyButton.setFocusTraversable(true);
+        // 将默认的窗口聚焦拉到它上面！
+        applyButton.setOnAction(e -> tableAction.accept(null));
+        name.setOnAction(e -> tableAction.accept(null));
+        Tool.setEnterKeyForButton(applyButton);
+
+        // 设置取消按钮
+        Button cancelButton = (Button) setNamePane.lookupButton(ButtonType.CANCEL);
+        cancelButton.setFocusTraversable(true);
+        cancelButton.setOnAction(e -> stage.close());
+        Tool.setEnterKeyForButton(cancelButton);
+
+        name.requestFocus();
+    }
+
+    private static void createDetailsTable() {
+        final FileController normalFileData = Controller.instance.getFileData(Paths.get("res", "file", "owid-covid-data.csv").toFile());
+        createTable("设置表格名称", normalFileData.basicListColName, normalFileData.basicList);
+    }
+
+    private static void createAbstractTable() {
+        final FileController normalFileData = Controller.instance.getFileData(Paths.get("res", "file", "owid-covid-data.csv").toFile());
+        createTable("设置表格名称", normalFileData.higherListColName, normalFileData.higherList);
     }
 
     @Override
@@ -715,19 +802,34 @@ public class Launch extends Application {
         // 设置菜单栏位于主页上面。
         // 注意到，菜单栏设置时，其主体页面还尚未被创建。
         root.setTop(initMenuBar(scene));
+        {
+            TabPane tabPane1 = initTabPane();
+            storeMap.put("tabPane", tabPane1);
+            root.setCenter(tabPane1);
+        }
 
-        TabPane tabPane1 = initTabPane();
-        storeMap.put("tabPane", tabPane1);
-        root.setCenter(tabPane1);
+        // 我想要全屏呜呜~
+        {
+            // 全屏快捷键 Alt + Shift + F(ull) ~
+            primaryStage.setFullScreenExitHint("按 Alt/Option + Shift + F 切换全屏/窗口模式");
 
-        //全屏/窗口模式切换
-        primaryStage.addEventHandler(KeyEvent.KEY_RELEASED, e -> {
-            if (e.getCode() == KeyCode.F11)
-                primaryStage.setFullScreen(!primaryStage.isFullScreen());
-        });
+            // 对不起，我又用了全局映射了 qwq
+            Consumer<Void> flipTheFullScreen = v -> primaryStage.setFullScreen(!primaryStage.isFullScreen());
+            storeMap.put("flipTheFullScreen", flipTheFullScreen);
 
-        primaryStage.setFullScreenExitHint("按 F11 切换全屏/窗口模式");
-        primaryStage.setFullScreen(false);
+            primaryStage.setFullScreen(false);
+        }
+
+        {
+            // 关闭表单的快捷键 哇咔咔
+            // 通过 Control/Command + W 快速删除它 qwq
+
+            KeyCombination closeTab = new KeyCodeCombination(KeyCode.W, KeyCombination.META_DOWN);
+            scene.getAccelerators().put(closeTab, () -> {
+                TabPane tabPane = (TabPane) storeMap.get("tabPane");
+                tabPane.getTabs().remove(tabPane.getSelectionModel().getSelectedIndex());
+            });
+        }
 
         primaryStage.setScene(scene);
         primaryStage.setHeight(630);

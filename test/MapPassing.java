@@ -1,6 +1,8 @@
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class MapPassing {
 
@@ -24,6 +26,7 @@ public class MapPassing {
     }
 
     public static void main(String[] args) {
+
         System.out.println("Calculate the sqr value of 21: " + calcPow(21));
         System.out.println("Calculate the sqr value of 21 by map: ");
         System.out.println("Create a map with number=21");
