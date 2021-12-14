@@ -245,6 +245,10 @@ public final class Tool {
         return null;
     }
 
+    public static String toString(Data data, List<String> colNames) {
+        return colNames.stream().map(data::fetch).collect(Collectors.joining(","));
+    }
+
 
 
 }

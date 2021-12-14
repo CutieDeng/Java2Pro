@@ -1,8 +1,8 @@
 package service;
 
 import javafx.scene.Scene;
+import javafx.scene.control.MenuBar;
 
-import java.awt.*;
 import java.util.function.Consumer;
 
 public interface InitMenuBarService {
