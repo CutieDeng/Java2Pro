@@ -2,9 +2,16 @@ package serviceimplements;
 
 import javafx.scene.control.MenuBar;
 import service.InitMenuBarService;
+import service.InitMenuService;
 
 import java.util.function.Consumer;
 
+/**
+ * 基本的菜单页面实现<br>
+ * <p/>
+ *
+ *
+ */
 public class SimpleInitMenuBarService implements InitMenuBarService {
 
     private MenuBar init() {
@@ -17,9 +24,9 @@ public class SimpleInitMenuBarService implements InitMenuBarService {
     }
 
     @Override
-    public MenuBar init(Consumer<MenuBar> finalOperation) {
-        MenuBar ans = init();
-        finalOperation.accept(ans);
+    public MenuBar init(InitMenuService service, Consumer<MenuBar> finalOperation) {
+        final MenuBar ans = init();
+        ans.getMenus().addAll(service.initMenus());
         return ans;
     }
 }

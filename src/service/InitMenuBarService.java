@@ -1,8 +1,10 @@
 package service;
 
 import javafx.scene.Scene;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 public interface InitMenuBarService {
@@ -14,10 +16,6 @@ public interface InitMenuBarService {
      *
      * @return
      */
-    MenuBar init(Consumer<MenuBar> finalOperation);
-
-    default MenuBar init(Scene scene, Consumer<MenuBar> finalOperation) {
-        return init(finalOperation);
-    }
+    MenuBar init(InitMenuService service, Consumer<MenuBar> finalOperation);
 
 }
