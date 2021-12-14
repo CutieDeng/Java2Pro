@@ -573,6 +573,21 @@ public class Launch extends Application {
         Menu help = new Menu("帮助");
         menuBar.getMenus().addAll(menuFile, menuData, help);
 
+
+        //Items in menuFile
+        {
+            MenuItem save = new MenuItem("保存");
+            save.setOnAction(event -> {
+
+            });
+
+
+
+            menuFile.getItems().add(save);
+        }
+
+
+
         {
             // 设置显示、隐藏提示框的操作，并增加新的快捷键
             MenuItem displayOption = (MenuItem) storeMap.get("displayOption");
