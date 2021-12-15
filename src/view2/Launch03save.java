@@ -10,6 +10,7 @@ import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Button;
 import javafx.scene.control.Slider;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyEvent;
@@ -20,7 +21,9 @@ import javafx.stage.Stage;
 
 import javax.imageio.ImageIO;
 import java.io.File;
+import java.io.IOException;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
 
 /**
  * Launch03 是一个试验性类，负责实验滑动条的相关特性。<br>
@@ -76,20 +79,25 @@ public class Launch03save extends Application {
 
 
             //todo:图像显示有问题
-            SnapshotParameters parameters = new SnapshotParameters();
-            WritableImage writableImage = new WritableImage(4000, 4000);
-            chart.snapshot(new SnapshotParameters(), writableImage);
-            File fileA = new File("chart.png");
-            try {
-                ImageIO.write(SwingFXUtils.fromFXImage(writableImage, null), "png", fileA);
-            } catch (Exception s) {
-                s.printStackTrace();
-            }
-            fileA.createNewFile();
-
-
-
-
+            Button click = new Button("shoot!");
+            click.setOnAction(e -> {
+                SnapshotParameters parameters = new SnapshotParameters();
+                WritableImage writableImage = new WritableImage(4000, 4000);
+                chart.snapshot(new SnapshotParameters(), writableImage);
+                File fileA = new File("chart.png");
+                try {
+                    ImageIO.write(SwingFXUtils.fromFXImage(writableImage, null), "png", fileA);
+                } catch (Exception s) {
+                    s.printStackTrace();
+                }
+                boolean newFile = false;
+                try {
+                    newFile = fileA.createNewFile();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+                Logger.getGlobal().info("fileA.createNewFile = " + newFile);
+            });
 
             // 内部类 DataCaching, 负责控制图像中相应的函数信息。
             // 设置临界区，便于控制其数据的变化。
@@ -143,6 +151,8 @@ public class Launch03save extends Application {
             // 设置视图页面，并将滑动条设置在该页面的底部。
             BorderPane pane = new BorderPane(chart);
             pane.setBottom(rollSlider);
+
+            pane.setRight(click);
 
             primaryStage.setScene(new Scene(pane));
             primaryStage.show();
