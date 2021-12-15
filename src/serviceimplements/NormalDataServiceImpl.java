@@ -9,13 +9,13 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.util.List;
 
-public class NormalDataService implements DataService {
+public class NormalDataServiceImpl implements DataService {
 
     private static final File dataFile = Paths.get("res", "file", "owid-covid-data.csv").toFile();
 
     private FileController c;
 
-    public NormalDataService() {
+    public NormalDataServiceImpl() {
         c = Controller.instance.getFileData(dataFile);
     }
 

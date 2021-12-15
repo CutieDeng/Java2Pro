@@ -116,5 +116,5 @@ public interface TipService {
      * <p/>
      *
      */
-    void setTipMessage();
+    void setTipMessage(String information);
 }

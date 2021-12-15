@@ -34,6 +34,7 @@ public class SimpleMenuBarServiceImpl implements MenuBarService {
         // 实现一个文件管理栏位...
         {
             Menu file = new Menu("文件");
+            ans.getMenus().add(file);
 
             // 设置导出内容
             export = new MenuItem("导出");
@@ -49,6 +50,7 @@ public class SimpleMenuBarServiceImpl implements MenuBarService {
         // 增加一个快速视图实现
         {
             Menu view = new Menu("视图");
+            ans.getMenus().add(view);
 
             MenuItem countryLevel = new MenuItem("地区信息汇总");
             countryLevel.setDisable(true);
@@ -64,6 +66,8 @@ public class SimpleMenuBarServiceImpl implements MenuBarService {
             view.getItems().addAll(countryLevel, showLocationTable, showLocationBar, showLocationPie, new SeparatorMenuItem());
 
             MenuItem covidLevel = new MenuItem("疫情信息汇总");
+            covidLevel.setDisable(true);
+
             showCovidTable = new MenuItem("表格");
             showCovidBar = new MenuItem("条形图");
             showCovidPie = new MenuItem("饼状图");
@@ -76,7 +80,6 @@ public class SimpleMenuBarServiceImpl implements MenuBarService {
 
             view.getItems().addAll(covidLevel, showCovidTable, showCovidBar, showCovidPie, showCovidLine, new SeparatorMenuItem());
         }
-
     }
 
     @Override

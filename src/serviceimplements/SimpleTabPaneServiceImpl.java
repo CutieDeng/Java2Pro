@@ -28,6 +28,4 @@ public class SimpleTabPaneServiceImpl implements TabPaneService {
     }
 
 
-
-
 }

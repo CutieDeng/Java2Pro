@@ -3,23 +3,29 @@ package serviceimplements;
 import service.*;
 
 public class SimpleFactory implements ServiceFactory {
+
+    private final MenuBarService menuBarService = new SimpleMenuBarServiceImpl();
+    private final TipService tipService = new SimpleTipServiceImpl();
+    private final TabPaneService tabPaneService = new SimpleTabPaneServiceImpl();
+    private final ShortcutService shortcutService = null;
+
     @Override
     public MenuBarService getMenuBarService() {
-        return null;
+        return menuBarService;
     }
 
     @Override
     public TipService getTipService() {
-        return null;
+        return tipService;
     }
 
     @Override
     public TabPaneService getTabPaneService() {
-        return null;
+        return tabPaneService;
     }
 
     @Override
     public ShortcutService getShortcutService() {
-        return null;
+        return shortcutService;
     }
 }
