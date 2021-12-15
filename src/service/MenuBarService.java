@@ -1,6 +1,10 @@
 package service;
 
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.scene.control.MenuBar;
+
+import java.util.function.Consumer;
 
 /**
  * 菜单栏服务提供<br>
@@ -50,5 +54,62 @@ public interface MenuBarService {
      * @return 菜单相关服务初始化时创建的菜单栏。
      */
     MenuBar getMenuBar();
+
+    /**
+     * 设置「导出」键的方法绑定
+     * @param consumer 导出键单击后的操作
+     * @return true 如果绑定操作成功
+     */
+    default boolean setExportOnAction(Consumer<Void> consumer) {
+        return false;
+    }
+
+    /**
+     * 设置关闭键的行为绑定<br>
+     * 单击关闭键将会关闭当前正在显示的标签页。<br>
+     * <p/>
+     *
+     * @param consumer 单击「关闭」键后的操作
+     * @return true 如果绑定成功
+     */
+    default boolean setCloseOnAction(Consumer<Void> consumer) {
+        return false;
+    }
+
+    /**
+     * 设置显示当前区域信息的表格行为绑定。<br>
+     * 该方法将会创建一个新的标签页以显示当前区域信息。<br>
+     * <p/>
+     *
+     * @param consumer 创建一个新的标签页以显示区域信息表行为定义
+     * @return true 如果绑定成功
+     */
+    default boolean setShowLocationTableOnAction(Consumer<Void> consumer) {
+        return false;
+    }
+
+    default boolean setShowLocationBarOnAction(Consumer<Void> consumer) {
+        return false;
+    }
+
+    default boolean setShowLocationPieOnAction(Consumer<Void> consumer) {
+        return false;
+    }
+
+    default boolean setShowCovidTableOnAction(Consumer<Void> consumer) {
+        return false;
+    }
+
+    default boolean setShowCovidBarOnAction(Consumer<Void> consumer) {
+        return false;
+    }
+
+    default boolean setShowCovidPieOnAction(Consumer<Void> consumer) {
+        return false;
+    }
+
+    default boolean setShowCovidLineOnAction(Consumer<Void> consumer) {
+        return false;
+    }
 
 }

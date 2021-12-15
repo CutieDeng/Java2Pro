@@ -8,17 +8,13 @@ public class SimpleTabPaneServiceImpl implements TabPaneService {
     private TabPane ans;
 
     /**
-     * 调用该方法初始化一个标签页。<br>
+     * 调用该方法初始化一个标签页管理页。<br>
      * <p/>
-     *
-     *
      */
     @Override
     public void init() {
         ans = new TabPane();
     }
-
-
 
     /**
      * 请在初始化主页之后调用该方法，以获得初始化出来的 tab pane. <br>
@@ -30,4 +26,8 @@ public class SimpleTabPaneServiceImpl implements TabPaneService {
     public TabPane getTabPane() {
         return ans;
     }
+
+
+
+
 }

@@ -20,5 +20,5 @@ public interface ServiceFactory {
     MenuBarService getMenuBarService();
     TipService getTipService();
     TabPaneService getTabPaneService();
-
+    ShortcutService getShortcutService();
 }
