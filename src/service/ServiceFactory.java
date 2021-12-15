@@ -1,8 +1,14 @@
 package service;
 
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.Tab;
-
+/**
+ * GUI 服务工厂 <br>
+ * <p/>
+ *
+ * 通过实现该工厂的所有方法来为 GUI 的整体设计提供所有功能。<br>
+ * <p/>
+ *
+ *
+ */
 public interface ServiceFactory {
 
 

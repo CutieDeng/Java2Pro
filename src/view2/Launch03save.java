@@ -81,9 +81,7 @@ public class Launch03save extends Application {
             //todo:图像显示有问题
             Button click = new Button("shoot!");
             click.setOnAction(e -> {
-                SnapshotParameters parameters = new SnapshotParameters();
-                WritableImage writableImage = new WritableImage(4000, 4000);
-                chart.snapshot(new SnapshotParameters(), writableImage);
+                WritableImage writableImage = chart.snapshot(new SnapshotParameters(), null);
                 File fileA = new File("chart.png");
                 try {
                     ImageIO.write(SwingFXUtils.fromFXImage(writableImage, null), "png", fileA);
