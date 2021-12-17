@@ -11,13 +11,11 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Shape;
+import service.DataService;
 import service.ServiceFactory;
-import service.TabGenerateService;
+import serviceimplements.HighDataServiceImpl;
+import serviceimplements.NormalDataServiceImpl;
 import tool.Controller;
-import tool.DisplayType;
 import tool.FileController;
 import tool.Tool;
 import util.Holder;
@@ -33,7 +31,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.ToIntFunction;
 
-public class BasicInfoTableSupplyImpl implements TabGenerateService {
+public class BasicInfoTableSupplyImpl extends AbstractTabSupplyImpl {
 
     private static final ToIntFunction<String> cntSupplier = new ToIntFunction<String>() {
         private final Map<String, Integer> supplierMap = new HashMap<>();
@@ -68,13 +66,23 @@ public class BasicInfoTableSupplyImpl implements TabGenerateService {
         return view;
     }
 
-    final FileController lists = Controller.instance.getFileData(Paths.get("res", "file", "owid-covid-data.csv").toFile());
+    final DataService service = new HighDataServiceImpl();
 
+    @Override
+    protected Consumer<Void> getBeforeAction() {
+        return null;
+    }
+
+    @Override
+    protected Consumer<Void> getAfterAllAction() {
+        return null;
+    }
 
     @Override
     public Tab supply(ServiceFactory factory) {
         // 初始化一个标签页
-        Tab ans = new Tab("Basic Info Table " + cntSupplier);
+        Tab ans = super.supply(factory);
+        ans.setText("Basic Info Table " + cntSupplier);
 
         // 设置该标签页的提示信息
         ans.setTooltip(new Tooltip("区域基本信息表"));
@@ -167,13 +175,13 @@ public class BasicInfoTableSupplyImpl implements TabGenerateService {
         // 创建表的相关操作
         {
             @SuppressWarnings("unchecked")
-            TableView<Tmp> tableRowTableView = initTableView(lists.basicListColName, lists.basicList);
+            TableView<Tmp> tableRowTableView = initTableView(service.getColumnNames(), service.getDataList());
             viewPane.setCenter(tableRowTableView);
             // 稍稍设置一下相关的图形参数吧，让它好看点
             tableRowTableView.setPadding(new Insets(20));
 
             // 设置搜索会发生的事情
-            @SuppressWarnings("unchecked") final List<Data> rows = lists.basicList;
+            @SuppressWarnings("unchecked") final List<Data> rows = service.getDataList();
 
             searchBoxActionHolder.obj = (searchText) -> {
                 ObservableList<Tmp> searchList = FXCollections.observableArrayList();
@@ -181,9 +189,9 @@ public class BasicInfoTableSupplyImpl implements TabGenerateService {
                 rows.stream().filter(d -> {
                     if (d.fetch("location").contains(searchText))
                         return true;
-                    if (d.fetch("iso code").contains(searchText))
+                    if (d.fetch("iso code").startsWith(searchText))
                         return true;
-                    if (d.fetch("date").equals(searchText))
+                    if (d.fetch("continent").contains(searchText))
                         return true;
                     return false;
                 }).map(Tool::createRow).forEach(searchList::add);
