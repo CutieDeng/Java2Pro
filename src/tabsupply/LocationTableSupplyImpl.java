@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.*;
 
-public class BasicInfoTableSupplyImpl extends AbstractTabSupplyImpl {
+public class LocationTableSupplyImpl extends AbstractTabSupplyImpl {
 
     private static final Supplier<Integer> cntSupplier = new Supplier<Integer>() {
         int number = 1;
@@ -78,10 +78,10 @@ public class BasicInfoTableSupplyImpl extends AbstractTabSupplyImpl {
     public Tab supply(ServiceFactory factory) {
         // 初始化一个标签页
         Tab ans = super.supply(factory);
-        ans.setText("Basic Info Table " + cntSupplier.get());
+        ans.setText("Location Table " + cntSupplier.get());
 
         // 设置该标签页的提示信息
-        ans.setTooltip(new Tooltip("区域基本信息表"));
+        ans.setTooltip(new Tooltip("地区信息表"));
 
         // 设置该标签页内部的页面框架。
         BorderPane viewPane = new BorderPane();
@@ -142,21 +142,6 @@ public class BasicInfoTableSupplyImpl extends AbstractTabSupplyImpl {
             // 集中处理搜索事件
             searchField.setOnAction(e -> searchAction.accept(searchField.getText()));
             searchConfirmButton.setOnAction(e -> searchAction.accept(searchField.getText()));
-
-            //todo: 还想不到好的GUI设计，暂时这样呈现，有点点丑
-            DatePicker datePicker = new DatePicker(LocalDate.now());
-            datePicker.setEditable(false);
-            searchBox.getChildren().add(datePicker);
-
-            datePicker.valueProperty().addListener((observable, oldValue, newValue) -> {
-                String date = newValue.format(DateTimeFormatter.ISO_DATE);
-                searchField.setText(date);
-            });
-            datePicker.addEventFilter(MouseEvent.MOUSE_ENTERED, e -> factory.getTipService().setTipMessage("通过点击日期快速搜索对应时间"));
-            datePicker.addEventFilter(MouseEvent.MOUSE_EXITED, e -> factory.getTipService().setTipMessage(""));
-
-            datePicker.setOnAction(e -> searchAction.accept(searchField.getText()));
-
 
         }
 

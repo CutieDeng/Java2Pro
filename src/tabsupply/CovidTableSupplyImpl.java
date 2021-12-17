@@ -29,7 +29,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.ToIntFunction;
 
-public class CovidInfoTableSupplyImpl extends AbstractTabSupplyImpl {
+public class CovidTableSupplyImpl extends AbstractTabSupplyImpl {
 
     private static final Supplier<Integer> cntSupplier = new Supplier<Integer>() {
         int number = 1;
@@ -77,10 +77,10 @@ public class CovidInfoTableSupplyImpl extends AbstractTabSupplyImpl {
     public Tab supply(ServiceFactory factory) {
         // 初始化一个标签页
         Tab ans = super.supply(factory);
-        ans.setText("Covid Info Table " + cntSupplier.get());
+        ans.setText("Covid Table " + cntSupplier.get());
 
         // 设置该标签页的提示信息
-        ans.setTooltip(new Tooltip("疫情相关信息表"));
+        ans.setTooltip(new Tooltip("疫情信息表"));
 
         // 设置该标签页内部的页面框架。
         BorderPane viewPane = new BorderPane();
