@@ -115,7 +115,7 @@ public class SimpleMenuBarServiceImpl implements MenuBarService {
             showLocationTable.setDisable(true);
         } else {
             showLocationTable.setOnAction(e -> consumer.accept(null));
-            showLocationTable.setDisable(true);
+            showLocationTable.setDisable(false);
         }
         return true;
     }
@@ -148,7 +148,7 @@ public class SimpleMenuBarServiceImpl implements MenuBarService {
             showCovidTable.setDisable(true);
         else {
             showCovidTable.setOnAction(e -> consumer.accept(null));
-            showCovidTable.setDisable(true);
+            showCovidTable.setDisable(false);
         }
         return true;
     }
