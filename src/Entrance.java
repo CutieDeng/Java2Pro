@@ -5,10 +5,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import service.ServiceFactory;
 import serviceimplements.SimpleFactory;
-import tabsupply.BlankTabSupplyImpl;
-import tabsupply.CovidTableSupplyImpl;
-import tabsupply.LocationBarTabSupplyImpl;
-import tabsupply.LocationTableSupplyImpl;
+import tabsupply.*;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -45,7 +42,7 @@ public class Entrance extends Application {
         {
             factory.getMenuBarService().setShowLocationTableOnAction(v -> selectNewTab(factory, () -> new LocationTableSupplyImpl().supply(factory)).accept(null));
             factory.getMenuBarService().setShowCovidTableOnAction(v -> selectNewTab(factory, () -> new CovidTableSupplyImpl().supply(factory)).accept(null));
-            factory.getMenuBarService().setShowLocationBarOnAction(v -> selectNewTab(factory, () -> new LocationBarTabSupplyImpl().supply(factory)).accept(null));
+            factory.getMenuBarService().setShowLocationBarOnAction(v -> selectNewTab(factory, () -> new LocationBarChartTabSupplyImpl().supply(factory)).accept(null));
         }
 
         primaryStage.show();
