@@ -89,7 +89,7 @@ public class LocationBarChartTabSupplyImpl extends AbstractTabSupplyImpl{
                                 else
                                     return 0;
                             })
-                            .limit(21)
+                            .limit(14)
                             .forEach(d -> infoGroup[finalI].add(new XYChart.Data<>(d.fetch("location"),
                                     Double.parseDouble(d.fetch(buttons[finalI].getText())))));
                 }
@@ -97,7 +97,11 @@ public class LocationBarChartTabSupplyImpl extends AbstractTabSupplyImpl{
                 group.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
                     OptionalInt any = IntStream.range(0, buttons.length).filter(b -> buttons[b].equals(newValue)).findAny();
                     if (any.isPresent()) {
-                        chart.getData().get(0).setData(infoGroup[any.getAsInt()]);
+                        System.out.println("Now set the data from infoGroup[" + any.getAsInt() + "]. ");
+                        chart.getData().remove(0);
+                        XYChart.Series<String, Number> series = new XYChart.Series();
+                        series.setData(infoGroup[any.getAsInt()]);
+                        chart.getData().add(series);
                     }
                 });
             }
