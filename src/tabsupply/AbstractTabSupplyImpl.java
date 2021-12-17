@@ -106,4 +106,8 @@ public abstract class AbstractTabSupplyImpl implements TabGenerateService {
         node.addEventHandler(MouseEvent.MOUSE_ENTERED, e -> tipService.setTipMessage(tipInfoSupplier.get()));
         node.addEventHandler(MouseEvent.MOUSE_EXITED, e -> tipService.setTipMessage(""));
     }
+
+    protected static void setTip(Node node, TipService service, Supplier<String> tipInfoSupplier) {
+        setTip(node, tipInfoSupplier, service);
+    }
 }

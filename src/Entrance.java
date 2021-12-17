@@ -6,6 +6,9 @@ import javafx.stage.Stage;
 import service.ServiceFactory;
 import serviceimplements.SimpleFactory;
 import tabsupply.*;
+import tabsupply.CovidTableTabSupplyImpl;
+import tabsupply.LocationBarTabSupplyImpl;
+import tabsupply.LocationTableTabSupplyImpl;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -40,9 +43,9 @@ public class Entrance extends Application {
         pane.setBottom(factory.getTipService().getTip());
 
         {
-            factory.getMenuBarService().setShowLocationTableOnAction(v -> selectNewTab(factory, () -> new LocationTableSupplyImpl().supply(factory)).accept(null));
-            factory.getMenuBarService().setShowCovidTableOnAction(v -> selectNewTab(factory, () -> new CovidTableSupplyImpl().supply(factory)).accept(null));
-            factory.getMenuBarService().setShowLocationBarOnAction(v -> selectNewTab(factory, () -> new LocationBarChartTabSupplyImpl().supply(factory)).accept(null));
+            factory.getMenuBarService().setShowLocationTableOnAction(v -> selectNewTab(factory, () -> new LocationTableTabSupplyImpl().supply(factory)).accept(null));
+            factory.getMenuBarService().setShowCovidTableOnAction(v -> selectNewTab(factory, () -> new CovidTableTabSupplyImpl().supply(factory)).accept(null));
+            factory.getMenuBarService().setShowLocationBarOnAction(v -> selectNewTab(factory, () -> new LocationBarTabSupplyImpl().supply(factory)).accept(null));
         }
 
         primaryStage.show();

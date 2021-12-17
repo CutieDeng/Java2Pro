@@ -8,6 +8,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.PickResult;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -15,21 +16,21 @@ import service.DataService;
 import service.ServiceFactory;
 import serviceimplements.HighDataServiceImpl;
 import serviceimplements.NormalDataServiceImpl;
+import tool.Controller;
+import tool.FileController;
 import tool.Tool;
 import util.Holder;
 import view2.Tmp;
 
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.function.ToIntFunction;
+import java.util.function.*;
 
-public class CovidTableSupplyImpl extends AbstractTabSupplyImpl {
+public class LocationTableTabSupplyImpl extends AbstractTabSupplyImpl {
 
     private static final Supplier<Integer> cntSupplier = new Supplier<Integer>() {
         int number = 1;
@@ -61,7 +62,7 @@ public class CovidTableSupplyImpl extends AbstractTabSupplyImpl {
         return view;
     }
 
-    final DataService service = new NormalDataServiceImpl();
+    final DataService service = new HighDataServiceImpl();
 
     @Override
     protected Consumer<Void> getBeforeAction() {
@@ -77,10 +78,10 @@ public class CovidTableSupplyImpl extends AbstractTabSupplyImpl {
     public Tab supply(ServiceFactory factory) {
         // 初始化一个标签页
         Tab ans = super.supply(factory);
-        ans.setText("Covid Table " + cntSupplier.get());
+        ans.setText("Location Table " + cntSupplier.get());
 
         // 设置该标签页的提示信息
-        ans.setTooltip(new Tooltip("疫情信息表"));
+        ans.setTooltip(new Tooltip("地区信息表"));
 
         // 设置该标签页内部的页面框架。
         BorderPane viewPane = new BorderPane();
@@ -120,8 +121,7 @@ public class CovidTableSupplyImpl extends AbstractTabSupplyImpl {
 
             // 增添提示信息
             searchField.setPromptText("请输入关键词");
-            searchField.addEventHandler(MouseEvent.MOUSE_ENTERED, e -> factory.getTipService().setTipMessage("输入关键词以搜索相关信息"));
-            searchField.addEventHandler(MouseEvent.MOUSE_EXITED, e -> factory.getTipService().setTipMessage(""));
+            setTip(searchField, factory.getTipService(), () -> "输入关键词以搜索相关信息");
 
 
             // 创建搜索按钮
@@ -129,8 +129,7 @@ public class CovidTableSupplyImpl extends AbstractTabSupplyImpl {
             searchConfirmButton.setPrefSize(50, 20);
 
             // 新增搜索按钮的提示信息
-            searchConfirmButton.addEventHandler(MouseEvent.MOUSE_ENTERED, e -> factory.getTipService().setTipMessage("点击确认搜索"));
-            searchConfirmButton.addEventHandler(MouseEvent.MOUSE_EXITED, e -> factory.getTipService().setTipMessage(""));
+            setTip(searchConfirmButton, factory.getTipService(), () -> "点击确认搜索");
 
             // 将搜索框和搜索按钮一同添加到搜索组件中。
             searchBox.getChildren().addAll(searchField, searchConfirmButton);
@@ -141,21 +140,6 @@ public class CovidTableSupplyImpl extends AbstractTabSupplyImpl {
             // 集中处理搜索事件
             searchField.setOnAction(e -> searchAction.accept(searchField.getText()));
             searchConfirmButton.setOnAction(e -> searchAction.accept(searchField.getText()));
-
-            //todo: 还想不到好的GUI设计，暂时这样呈现，有点点丑
-            DatePicker datePicker = new DatePicker(LocalDate.now());
-            datePicker.setEditable(false);
-            searchBox.getChildren().add(datePicker);
-
-            datePicker.valueProperty().addListener((observable, oldValue, newValue) -> {
-                String date = newValue.format(DateTimeFormatter.ISO_DATE);
-                searchField.setText(date);
-            });
-            datePicker.addEventFilter(MouseEvent.MOUSE_ENTERED, e -> factory.getTipService().setTipMessage("通过点击日期快速搜索对应时间"));
-            datePicker.addEventFilter(MouseEvent.MOUSE_EXITED, e -> factory.getTipService().setTipMessage(""));
-
-            datePicker.setOnAction(e -> searchAction.accept(searchField.getText()));
-
 
         }
 
@@ -177,9 +161,9 @@ public class CovidTableSupplyImpl extends AbstractTabSupplyImpl {
                 rows.stream().filter(d -> {
                     if (d.fetch("location").contains(searchText))
                         return true;
-                    if (d.fetch("iso code").contains(searchText))
+                    if (d.fetch("iso code").startsWith(searchText))
                         return true;
-                    if (d.fetch("date").equals(searchText))
+                    if (d.fetch("continent").contains(searchText))
                         return true;
                     return false;
                 }).map(Tool::createRow).forEach(searchList::add);
