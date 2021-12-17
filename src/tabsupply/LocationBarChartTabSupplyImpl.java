@@ -45,7 +45,7 @@ public class LocationBarChartTabSupplyImpl extends AbstractTabSupplyImpl{
     @Override
     protected Tab tabGenerate() {
         Tab ans = super.tabGenerate();
-        ans.setText("区域信息条形统计图 " + cntSupplier);
+        ans.setText("区域信息条形统计图 " + cntSupplier.getAsInt());
         return ans;
     }
 
@@ -78,6 +78,7 @@ public class LocationBarChartTabSupplyImpl extends AbstractTabSupplyImpl{
                 Axis<String> x = new CategoryAxis();
                 Axis<Number> y = new NumberAxis();
                 BarChart<String, Number> chart = new BarChart<>(x, y);
+                x.setAnimated(false);
 
                 pane.setCenter(chart);
 
@@ -107,7 +108,7 @@ public class LocationBarChartTabSupplyImpl extends AbstractTabSupplyImpl{
                     if (any.isPresent()) {
                         System.out.println("Now set the data from infoGroup[" + any.getAsInt() + "]. ");
                         chart.getData().remove(0);
-                        XYChart.Series<String, Number> series = new XYChart.Series();
+                        XYChart.Series<String, Number> series = new XYChart.Series<>();
                         series.setData(infoGroup[any.getAsInt()]);
                         chart.getData().add(series);
                     }
