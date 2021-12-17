@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 
 /**
  * 标准、抽象的页面提供实现。<br>
+ * <p/>
  */
 public abstract class AbstractTabSupplyImpl implements TabGenerateService {
 
@@ -86,9 +87,11 @@ public abstract class AbstractTabSupplyImpl implements TabGenerateService {
             public void handle(Event e) {
                 isShown = !isShown;
                 if (isShown) {
-                    getBeforeAction().accept(null);
+                    if (getBeforeAction() != null)
+                        getBeforeAction().accept(null);
                 } else {
-                    getAfterAllAction().accept(null);
+                    if (getAfterAllAction() != null)
+                        getAfterAllAction().accept(null);
                 }
             }
         });
