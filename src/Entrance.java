@@ -70,6 +70,11 @@ public class Entrance extends Application {
                 factory.getTabPaneService().getTabPane().getTabs().add(newTab);
                 factory.getTabPaneService().getTabPane().getSelectionModel().select(newTab);
             });
+            factory.getMenuBarService().setShowCovidLineOnAction(v -> {
+                Tab newTab = new CovidLineTabSupplyImpl().supply(factory);
+                factory.getTabPaneService().getTabPane().getTabs().add(newTab);
+                factory.getTabPaneService().getTabPane().getSelectionModel().select(newTab);
+            });
 
 
         }
