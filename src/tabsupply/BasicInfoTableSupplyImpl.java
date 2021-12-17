@@ -1,0 +1,201 @@
+package tabsupply;
+
+import data.Data;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Shape;
+import service.ServiceFactory;
+import service.TabGenerateService;
+import tool.Controller;
+import tool.DisplayType;
+import tool.FileController;
+import tool.Tool;
+import util.Holder;
+import view2.Tmp;
+
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.ToIntFunction;
+
+public class BasicInfoTableSupplyImpl implements TabGenerateService {
+
+    private static final ToIntFunction<String> cntSupplier = new ToIntFunction<String>() {
+        private final Map<String, Integer> supplierMap = new HashMap<>();
+        @Override
+        synchronized
+        public int applyAsInt(String s) {
+            if (!supplierMap.containsKey(s)) {
+                supplierMap.put(s, 1);
+            } else supplierMap.put(s, supplierMap.get(s) + 1);
+            return supplierMap.get(s);
+        }
+    };
+
+    private static TableView<Tmp> initTableView(List<String> colNames, List<Data> datas) {
+        TableView<Tmp> view = new TableView<>();
+        view.setTableMenuButtonVisible(true);
+
+        final ToIntFunction<String> widthSupplier = str -> 80;
+
+        final Function<String, TableColumn<Tmp, String>> colGenerator =
+                s -> {
+                    final TableColumn<Tmp, String> col = new TableColumn<>(s);
+                    col.setCellValueFactory(new PropertyValueFactory<>(s));
+                    col.setPrefWidth(widthSupplier.applyAsInt(s));
+                    return col;
+                };
+        colNames.forEach(cn -> view.getColumns().add(colGenerator.apply(Tool.transferReverse(cn))));
+
+        ObservableList<Tmp> dataList = FXCollections.observableArrayList();
+        datas.stream().map(Tool::createRow).forEach(dataList::add);
+        view.setItems(dataList);
+        return view;
+    }
+
+    final FileController lists = Controller.instance.getFileData(Paths.get("res", "file", "owid-covid-data.csv").toFile());
+
+
+    @Override
+    public Tab supply(ServiceFactory factory) {
+        // 初始化一个标签页
+        Tab ans = new Tab("Basic Info Table " + cntSupplier);
+
+        // 设置该标签页的提示信息
+        ans.setTooltip(new Tooltip("区域基本信息表"));
+
+        ans.tabPaneProperty().addListener((observable, oldValue, newValue) -> newValue.selectionModelProperty().addListener((observable1, oldValue1, newValue1) -> {
+            System.out.println("FROM " + ans + ": ");
+            System.out.println(observable1);
+            System.out.println(oldValue1);
+            System.out.println(newValue1);
+        }));
+
+        // 设置该标签页内部的页面框架。
+        BorderPane viewPane = new BorderPane();
+        ans.setContent(viewPane);
+
+        // 设置该标签页右边的相关选项框、搜索框。
+        HBox searchPane = new HBox();
+        searchPane.setPadding(new Insets(20));
+        viewPane.setRight(searchPane);
+
+        // 设置搜索、选择页的相关风格
+        searchPane.setStyle("-fx-background-color: #CCFF99;");
+        // 设置搜索、选择页的宽度
+        searchPane.setPrefWidth(200);
+
+        //设置table页面
+        final Holder<Consumer<String>> searchBoxActionHolder = new Holder<>();
+
+        // 创建搜索框等相关操作
+        {
+            // 搜索框
+            VBox searchBox = new VBox();
+            searchBox.setFocusTraversable(false);
+            searchBox.setSpacing(10);
+            searchBox.setAlignment(Pos.TOP_RIGHT);
+
+            // 可键入的搜索框初始化
+            TextField searchField = new TextField();
+            // 可以通过快捷键选中搜索文本框
+            searchField.setFocusTraversable(true);
+
+            // 新增搜索框的大小初始化描述
+            searchField.setPrefSize(150, 20);
+
+            // 搜索会发生的事情
+            final Consumer<String> searchAction = (searchContent) -> searchBoxActionHolder.obj.accept(searchContent);
+
+            // 增添提示信息
+            searchField.setPromptText("请输入关键词");
+            searchField.addEventHandler(MouseEvent.MOUSE_ENTERED, e -> factory.getTipService().setTipMessage("输入关键词以搜索相关信息"));
+            searchField.addEventHandler(MouseEvent.MOUSE_EXITED, e -> factory.getTipService().setTipMessage(""));
+
+
+            // 创建搜索按钮
+            Button searchConfirmButton = new Button("搜索");
+            searchConfirmButton.setPrefSize(50, 20);
+
+            // 新增搜索按钮的提示信息
+            searchConfirmButton.addEventHandler(MouseEvent.MOUSE_ENTERED, e -> factory.getTipService().setTipMessage("点击确认搜索"));
+            searchConfirmButton.addEventHandler(MouseEvent.MOUSE_EXITED, e -> factory.getTipService().setTipMessage(""));
+
+            // 将搜索框和搜索按钮一同添加到搜索组件中。
+            searchBox.getChildren().addAll(searchField, searchConfirmButton);
+
+            // 搜索组件放入右侧快捷栏中。
+            searchPane.getChildren().add(searchBox);
+
+            // 集中处理搜索事件
+            searchField.setOnAction(e -> searchAction.accept(searchField.getText()));
+            searchConfirmButton.setOnAction(e -> searchAction.accept(searchField.getText()));
+
+            //todo: 还想不到好的GUI设计，暂时这样呈现，有点点丑
+            DatePicker datePicker = new DatePicker(LocalDate.now());
+            datePicker.setEditable(false);
+            searchBox.getChildren().add(datePicker);
+
+            datePicker.valueProperty().addListener((observable, oldValue, newValue) -> {
+                String date = newValue.format(DateTimeFormatter.ISO_DATE);
+                searchField.setText(date);
+            });
+            datePicker.addEventFilter(MouseEvent.MOUSE_ENTERED, e -> factory.getTipService().setTipMessage("通过点击日期快速搜索对应时间"));
+            datePicker.addEventFilter(MouseEvent.MOUSE_EXITED, e -> factory.getTipService().setTipMessage(""));
+
+            datePicker.setOnAction(e -> searchAction.accept(searchField.getText()));
+
+
+        }
+
+
+        // 创建表的相关操作
+        {
+            @SuppressWarnings("unchecked")
+            TableView<Tmp> tableRowTableView = initTableView(lists.basicListColName, lists.basicList);
+            viewPane.setCenter(tableRowTableView);
+            // 稍稍设置一下相关的图形参数吧，让它好看点
+            tableRowTableView.setPadding(new Insets(20));
+
+            // 设置搜索会发生的事情
+            @SuppressWarnings("unchecked") final List<Data> rows = lists.basicList;
+
+            searchBoxActionHolder.obj = (searchText) -> {
+                ObservableList<Tmp> searchList = FXCollections.observableArrayList();
+
+                rows.stream().filter(d -> {
+                    if (d.fetch("location").contains(searchText))
+                        return true;
+                    if (d.fetch("iso code").contains(searchText))
+                        return true;
+                    if (d.fetch("date").equals(searchText))
+                        return true;
+                    return false;
+                }).map(Tool::createRow).forEach(searchList::add);
+
+                tableRowTableView.setItems(searchList);
+            };
+
+        }
+
+
+
+        return ans;
+
+    }
+}
