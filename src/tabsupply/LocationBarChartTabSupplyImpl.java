@@ -12,7 +12,6 @@ import javafx.scene.layout.VBox;
 import service.DataService;
 import service.ServiceFactory;
 import serviceimplements.HighDataServiceImpl;
-import tool.Tool;
 
 import java.util.List;
 import java.util.OptionalInt;
@@ -50,6 +49,14 @@ public class LocationBarChartTabSupplyImpl extends AbstractTabSupplyImpl{
         return ans;
     }
 
+    public static VBox getSelectionsBox() {
+        VBox ans = new VBox();
+        ans.setSpacing(9.2);
+        ans.setPadding(new Insets(9.2));
+        ans.setPrefWidth(215.);
+        return ans;
+    }
+
     @Override
     public Tab supply(ServiceFactory factory) {
         super.supply(factory);
@@ -58,10 +65,7 @@ public class LocationBarChartTabSupplyImpl extends AbstractTabSupplyImpl{
         ans.setContent(pane);
 
         {
-            VBox verticalBox = new VBox();
-            verticalBox.setPadding(new Insets(9.2));
-            verticalBox.setSpacing(9.2);
-            verticalBox.setPrefWidth(215.);
+            VBox verticalBox = getSelectionsBox();
             pane.setRight(verticalBox);
 
             List<String> names = service.getColumnNames().stream()

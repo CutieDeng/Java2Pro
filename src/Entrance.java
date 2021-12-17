@@ -46,7 +46,7 @@ public class Entrance extends Application {
             factory.getMenuBarService().setShowLocationTableOnAction(v -> selectNewTab(factory, () -> new LocationTableTabSupplyImpl().supply(factory)).accept(null));
             factory.getMenuBarService().setShowCovidTableOnAction(v -> selectNewTab(factory, () -> new CovidTableTabSupplyImpl().supply(factory)).accept(null));
             factory.getMenuBarService().setShowLocationBarOnAction(v -> selectNewTab(factory, () -> new LocationBarChartTabSupplyImpl().supply(factory)).accept(null));
-            factory.getMenuBarService().setCloseOnAction(v -> selectNewTab(factory, () -> new ExportTestImpl().supply(factory)).accept(null));
+            factory.getMenuBarService().setShowCovidLineOnAction(v -> selectNewTab(factory, () -> new CovidLineChartTabSupplyImpl().supply(factory)).accept(null));
         }
 
         primaryStage.show();
