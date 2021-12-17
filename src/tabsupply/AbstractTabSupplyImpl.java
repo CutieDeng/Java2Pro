@@ -2,11 +2,15 @@ package tabsupply;
 
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.control.Tab;
+import javafx.scene.input.MouseEvent;
 import service.ServiceFactory;
 import service.TabGenerateService;
+import service.TipService;
 
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * 标准、抽象的页面提供实现。<br>
@@ -96,5 +100,10 @@ public abstract class AbstractTabSupplyImpl implements TabGenerateService {
             }
         });
         return ans;
+    }
+
+    protected static void setTip(Node node, Supplier<String> tipInfoSupplier, TipService tipService) {
+        node.addEventHandler(MouseEvent.MOUSE_ENTERED, e -> tipService.setTipMessage(tipInfoSupplier.get()));
+        node.addEventHandler(MouseEvent.MOUSE_EXITED, e -> tipService.setTipMessage(""));
     }
 }

@@ -5,7 +5,13 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import service.ServiceFactory;
 import serviceimplements.SimpleFactory;
-import tabsupply.*;
+import tabsupply.BlankTabSupplyImpl;
+import tabsupply.CovidTableSupplyImpl;
+import tabsupply.LocationBarTabSupplyImpl;
+import tabsupply.LocationTableSupplyImpl;
+
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class Entrance extends Application {
 
@@ -37,43 +43,19 @@ public class Entrance extends Application {
         pane.setBottom(factory.getTipService().getTip());
 
         {
-            factory.getMenuBarService().setShowCovidBarOnAction(v -> {
-                factory.getTabPaneService().getTabPane().getTabs().add(new BlankTabSupplyImpl().supply(factory));
-            });
-            factory.getMenuBarService().setShowLocationTableOnAction(v -> {
-                Tab newTab = new LocationTableSupplyImpl().supply(factory);
-                factory.getTabPaneService().getTabPane().getTabs().add(newTab);
-                factory.getTabPaneService().getTabPane().getSelectionModel().select(newTab);
-            });
-            factory.getMenuBarService().setShowCovidTableOnAction(v -> {
-                Tab newTab = new CovidTableSupplyImpl().supply(factory);
-                factory.getTabPaneService().getTabPane().getTabs().add(newTab);
-                factory.getTabPaneService().getTabPane().getSelectionModel().select(newTab);
-            });
-            factory.getMenuBarService().setShowLocationBarOnAction(v -> {
-                Tab newTab = new LocationBarTabSupplyImpl().supply(factory);
-                factory.getTabPaneService().getTabPane().getTabs().add(newTab);
-                factory.getTabPaneService().getTabPane().getSelectionModel().select(newTab);
-            });
-            factory.getMenuBarService().setShowCovidBarOnAction(v -> {
-                Tab newTab = new CovidBarTabSupplyImpl().supply(factory);
-                factory.getTabPaneService().getTabPane().getTabs().add(newTab);
-                factory.getTabPaneService().getTabPane().getSelectionModel().select(newTab);
-            });
-            factory.getMenuBarService().setShowLocationPieOnAction(v -> {
-                Tab newTab = new LocationPieTabSupplyImpl().supply(factory);
-                factory.getTabPaneService().getTabPane().getTabs().add(newTab);
-                factory.getTabPaneService().getTabPane().getSelectionModel().select(newTab);
-            });
-            factory.getMenuBarService().setShowCovidPieOnAction(v -> {
-                Tab newTab = new CovidPieTabSupplyImpl().supply(factory);
-                factory.getTabPaneService().getTabPane().getTabs().add(newTab);
-                factory.getTabPaneService().getTabPane().getSelectionModel().select(newTab);
-            });
-
-
+            factory.getMenuBarService().setShowLocationTableOnAction(v -> selectNewTab(factory, () -> new LocationTableSupplyImpl().supply(factory)).accept(null));
+            factory.getMenuBarService().setShowCovidTableOnAction(v -> selectNewTab(factory, () -> new CovidTableSupplyImpl().supply(factory)).accept(null));
+            factory.getMenuBarService().setShowLocationBarOnAction(v -> selectNewTab(factory, () -> new LocationBarTabSupplyImpl().supply(factory)).accept(null));
         }
 
         primaryStage.show();
+    }
+
+    private static Consumer<Void> selectNewTab(ServiceFactory factory, Supplier<Tab> supplier) {
+        return v -> {
+            Tab ans = supplier.get();
+            factory.getTabPaneService().getTabPane().getTabs().add(ans);
+            factory.getTabPaneService().getTabPane().getSelectionModel().select(ans);
+        };
     }
 }
