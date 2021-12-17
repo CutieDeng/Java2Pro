@@ -56,7 +56,7 @@ public class LocationBarTabSupplyImpl extends AbstractTabSupplyImpl {
     public Tab supply(ServiceFactory factory) {
         // 初始化一个标签页
         Tab ans = super.supply(factory);
-        ans.setText("Location Bar " + cntSupplier.get());
+        ans.setText("Location Bar Chart " + cntSupplier.get());
 
         // 设置该标签页的提示信息
         ans.setTooltip(new Tooltip("地区信息柱状图"));

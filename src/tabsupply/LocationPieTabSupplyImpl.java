@@ -1,33 +1,17 @@
 package tabsupply;
 
-import data.Data;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.chart.BarChart;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import service.DataService;
 import service.ServiceFactory;
 import serviceimplements.NormalDataServiceImpl;
-import tool.Tool;
-import util.Holder;
-import view2.Tmp;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.function.ToIntFunction;
 
-public class CovidBarTabSupplyImpl extends AbstractTabSupplyImpl {
+public class LocationPieTabSupplyImpl extends AbstractTabSupplyImpl {
 
     private static final Supplier<Integer> cntSupplier = new Supplier<Integer>() {
         int number = 1;
@@ -56,10 +40,10 @@ public class CovidBarTabSupplyImpl extends AbstractTabSupplyImpl {
     public Tab supply(ServiceFactory factory) {
         // 初始化一个标签页
         Tab ans = super.supply(factory);
-        ans.setText("Covid Bar Chart " + cntSupplier.get());
+        ans.setText("Location Pie Chart " + cntSupplier.get());
 
         // 设置该标签页的提示信息
-        ans.setTooltip(new Tooltip("疫情信息柱状图"));
+        ans.setTooltip(new Tooltip("地区信息饼图"));
 
         // 设置该标签页内部的页面框架。
         BorderPane viewPane = new BorderPane();

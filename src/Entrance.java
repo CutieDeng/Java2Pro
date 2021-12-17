@@ -55,8 +55,18 @@ public class Entrance extends Application {
                 factory.getTabPaneService().getTabPane().getTabs().add(newTab);
                 factory.getTabPaneService().getTabPane().getSelectionModel().select(newTab);
             });
-            factory.getMenuBarService().setShowLocationBarOnAction(v -> {
+            factory.getMenuBarService().setShowCovidBarOnAction(v -> {
                 Tab newTab = new CovidBarTabSupplyImpl().supply(factory);
+                factory.getTabPaneService().getTabPane().getTabs().add(newTab);
+                factory.getTabPaneService().getTabPane().getSelectionModel().select(newTab);
+            });
+            factory.getMenuBarService().setShowLocationPieOnAction(v -> {
+                Tab newTab = new LocationPieTabSupplyImpl().supply(factory);
+                factory.getTabPaneService().getTabPane().getTabs().add(newTab);
+                factory.getTabPaneService().getTabPane().getSelectionModel().select(newTab);
+            });
+            factory.getMenuBarService().setShowCovidPieOnAction(v -> {
+                Tab newTab = new CovidPieTabSupplyImpl().supply(factory);
                 factory.getTabPaneService().getTabPane().getTabs().add(newTab);
                 factory.getTabPaneService().getTabPane().getSelectionModel().select(newTab);
             });
