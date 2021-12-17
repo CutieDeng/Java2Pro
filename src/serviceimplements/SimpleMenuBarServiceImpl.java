@@ -101,10 +101,10 @@ public class SimpleMenuBarServiceImpl implements MenuBarService {
     @Override
     public boolean setCloseOnAction(Consumer<Void> consumer) {
         if (consumer == null) {
-            export.setDisable(true);
+            close.setDisable(true);
         } else {
-            export.setOnAction(e -> consumer.accept(null));
-            export.setDisable(false);
+            close.setOnAction(e -> consumer.accept(null));
+            close.setDisable(false);
         }
         return true;
     }
