@@ -1,15 +1,11 @@
 package tabsupply;
 
-import data.Data;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.chart.*;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Tab;
-import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
@@ -17,8 +13,10 @@ import service.DataService;
 import service.ServiceFactory;
 import serviceimplements.HighDataServiceImpl;
 
-import java.util.*;
+import java.util.List;
+import java.util.OptionalInt;
 import java.util.function.Consumer;
+import java.util.function.IntSupplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -36,9 +34,19 @@ public class LocationBarChartTabSupplyImpl extends AbstractTabSupplyImpl{
 
     private DataService service = new HighDataServiceImpl();
 
+    private static IntSupplier cntSupplier = new IntSupplier() {
+        private int cnt = 1;
+        @Override
+        public int getAsInt() {
+            return cnt++;
+        }
+    };
+
     @Override
     protected Tab tabGenerate() {
-        return super.tabGenerate();
+        Tab ans = super.tabGenerate();
+        ans.setText("区域信息条形统计图 " + cntSupplier);
+        return ans;
     }
 
     @Override
