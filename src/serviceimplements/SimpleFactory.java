@@ -5,7 +5,7 @@ import service.*;
 public class SimpleFactory implements ServiceFactory {
 
     private final MenuBarService menuBarService = new SimpleMenuBarServiceImpl();
-    private final TipService tipService = new SimpleTipServiceImpl();
+    private final TipService tipService = new AmuseTipServiceImpl();
     private final TabPaneService tabPaneService = new SimpleTabPaneServiceImpl();
     private final ShortcutService shortcutService = null;
 

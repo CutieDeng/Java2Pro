@@ -1,6 +1,10 @@
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import service.ServiceFactory;
@@ -47,6 +51,19 @@ public class Entrance extends Application {
             factory.getMenuBarService().setShowLocationBarOnAction(v -> selectNewTab(factory, () -> new LocationBarChartTabSupplyImpl().supply(factory)).accept(null));
             factory.getMenuBarService().setShowCovidLineOnAction(v -> selectNewTab(factory, () -> new CovidLineChartTabSupplyImpl().supply(factory)).accept(null));
             factory.getMenuBarService().setShowLocationPieOnAction(v -> selectNewTab(factory, () -> new LocationPieTabSupplyImpl().supply(factory)).accept(null));
+        }
+
+        // 快捷键硬编码 qwq
+        {
+            KeyCodeCombination closeAccelerate = new KeyCodeCombination(KeyCode.W, KeyCombination.META_DOWN);
+            scene.getAccelerators().put(closeAccelerate, new Runnable() {
+                @Override
+                synchronized
+                public void run() {
+                    TabPane tabPane = factory.getTabPaneService().getTabPane();
+                    tabPane.getTabs().remove(tabPane.getSelectionModel().getSelectedItem());
+                }
+            });
         }
 
         primaryStage.show();

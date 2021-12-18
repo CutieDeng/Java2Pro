@@ -22,19 +22,18 @@ import view2.Tmp;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.function.ToIntFunction;
+import java.util.function.*;
 
 public class CovidBarTabSupplyImpl extends AbstractTabSupplyImpl {
 
-    private static final Supplier<Integer> cntSupplier = new Supplier<Integer>() {
-        int number = 1;
+    private static final IntSupplier cntSupplier = new IntSupplier() {
+
+        private int cnt = 0;
+
         @Override
         synchronized
-        public Integer get() {
-            return number++;
+        public int getAsInt() {
+            return cnt++;
         }
     };
 
@@ -53,8 +52,11 @@ public class CovidBarTabSupplyImpl extends AbstractTabSupplyImpl {
     @Override
     public Tab supply(ServiceFactory factory) {
         // 初始化一个标签页
-        Tab ans = super.supply(factory);
-        ans.setText("Covid Bar Chart " + cntSupplier.get());
+        super.supply(factory);
+        {
+            int i = cntSupplier.getAsInt();
+            ans.setText("疫情信息柱状统计图" + (i == 0 ? "" : (" " + i)));
+        }
 
         // 设置该标签页的提示信息
         ans.setTooltip(new Tooltip("疫情信息柱状图"));
@@ -64,14 +66,25 @@ public class CovidBarTabSupplyImpl extends AbstractTabSupplyImpl {
         ans.setContent(viewPane);
 
         // 设置该标签页右边的相关选项框、搜索框。
-        HBox searchPane = new HBox();
-        searchPane.setPadding(new Insets(20));
-        viewPane.setRight(searchPane);
+        ScrollPane scrollP = new ScrollPane();
+        viewPane.setRight(scrollP);
 
-        // 设置搜索、选择页的相关风格
-        searchPane.setStyle("-fx-background-color: #CCFF99;");
+        VBox searchPane = StandTabSupplyTool.getSelectionsBox();
+        scrollP.setContent(searchPane);
+
         // 设置搜索、选择页的宽度
         searchPane.setPrefWidth(200);
+
+        {
+            BorderPane graphPane = new BorderPane();
+            viewPane.setCenter(graphPane);
+
+
+
+
+        }
+
+
 
         return ans;
 
