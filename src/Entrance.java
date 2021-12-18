@@ -7,7 +7,6 @@ import service.ServiceFactory;
 import serviceimplements.SimpleFactory;
 import tabsupply.*;
 import tabsupply.CovidTableTabSupplyImpl;
-import tabsupply.LocationBarTabSupplyImpl;
 import tabsupply.LocationTableTabSupplyImpl;
 
 import java.util.function.Consumer;
@@ -47,6 +46,7 @@ public class Entrance extends Application {
             factory.getMenuBarService().setShowCovidTableOnAction(v -> selectNewTab(factory, () -> new CovidTableTabSupplyImpl().supply(factory)).accept(null));
             factory.getMenuBarService().setShowLocationBarOnAction(v -> selectNewTab(factory, () -> new LocationBarChartTabSupplyImpl().supply(factory)).accept(null));
             factory.getMenuBarService().setShowCovidLineOnAction(v -> selectNewTab(factory, () -> new CovidLineChartTabSupplyImpl().supply(factory)).accept(null));
+            factory.getMenuBarService().setShowLocationPieOnAction(v -> selectNewTab(factory, () -> new LocationPieTabSupplyImpl().supply(factory)).accept(null));
         }
 
         primaryStage.show();

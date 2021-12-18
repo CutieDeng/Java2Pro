@@ -21,7 +21,7 @@ import java.util.function.IntSupplier;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import static tabsupply.LocationBarChartTabSupplyImpl.getSelectionsBox;
+import static tabsupply.StandTabSupplyTool.getSelectionsBox;
 
 public class CovidLineChartTabSupplyImpl extends AbstractTabSupplyImpl{
 
@@ -114,7 +114,7 @@ public class CovidLineChartTabSupplyImpl extends AbstractTabSupplyImpl{
                     scrollPane.setFitToWidth(true);
                     pane.setLeft(scrollPane);
 
-                    VBox locationBoxes = LocationBarChartTabSupplyImpl.getSelectionsBox();
+                    VBox locationBoxes = getSelectionsBox();
 
                     scrollPane.setContent(locationBoxes);
 

@@ -38,8 +38,6 @@ public class CovidBarTabSupplyImpl extends AbstractTabSupplyImpl {
         }
     };
 
-
-
     final DataService service = new NormalDataServiceImpl();
 
     @Override
