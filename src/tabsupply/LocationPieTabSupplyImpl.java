@@ -161,20 +161,8 @@ public class LocationPieTabSupplyImpl extends AbstractTabSupplyImpl {
     WritableImage writableImage;
 
     private void exportAction() {
-        Stage stage = new Stage();
-        FileChooser fileChooser = new FileChooser();
-
-        fileChooser.setTitle("save one file");
-
-        //默认文件名
-        fileChooser.setInitialFileName("LocationPieChart");
-
-        //设置选择的文件的扩展名
-        fileChooser.getExtensionFilters().addAll(
+        File file = StandTabSupplyTool.getChooseFile(new FileChooser(), "LocationPieChart",
                 new FileChooser.ExtensionFilter("image", "*.png"));
-
-        //返回用户选中的文件的路径，注意，如果用户不选，则会返回null
-        File file = fileChooser.showSaveDialog(stage);
 
         if (file == null) return;
 

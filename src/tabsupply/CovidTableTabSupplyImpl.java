@@ -222,21 +222,9 @@ public class CovidTableTabSupplyImpl extends AbstractTabSupplyImpl {
     private Predicate<Data> dataFilter = d -> true;
 
     private void exportAction() {
-        Stage stage = new Stage();
-        FileChooser fileChooser = new FileChooser();
-
-        fileChooser.setTitle("save one file");
-
-        //默认文件名
-        fileChooser.setInitialFileName("CovidTable");
-
-        //设置选择的文件的扩展名
-        fileChooser.getExtensionFilters().addAll(
+        File file = StandTabSupplyTool.getChooseFile(new FileChooser(), "CovidTable",
                 new FileChooser.ExtensionFilter("csv", "*.csv"),
                 new FileChooser.ExtensionFilter("txt", "*.txt"));
-
-        //返回用户选中的文件的路径，注意，如果用户不选，则会返回null
-        File file = fileChooser.showSaveDialog(stage);
 
         if (file == null) return;
 
