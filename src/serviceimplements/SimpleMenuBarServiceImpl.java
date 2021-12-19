@@ -25,6 +25,8 @@ public class SimpleMenuBarServiceImpl implements MenuBarService {
     private MenuItem showCovidPie;
     private MenuItem showCovidLine;
 
+    private MenuItem otherData;
+
     @Override
     public void init() {
         // 初始化我们的菜单栏！！！
@@ -79,6 +81,17 @@ public class SimpleMenuBarServiceImpl implements MenuBarService {
             showCovidLine.setDisable(true);
 
             view.getItems().addAll(covidLevel, showCovidTable, showCovidBar, showCovidPie, showCovidLine, new SeparatorMenuItem());
+        }
+
+        {
+            Menu other = new Menu("数据");
+            ans.getMenus().add(other);
+
+            otherData = new MenuItem("其他数据表");
+            otherData.setDisable(true);
+
+            other.getItems().add(otherData);
+
         }
     }
 
@@ -182,6 +195,17 @@ public class SimpleMenuBarServiceImpl implements MenuBarService {
         else {
             showCovidLine.setOnAction(e -> consumer.accept(null));
             showCovidLine.setDisable(false);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean setShowOtherDataAction(Consumer<Void> consumer) {
+        if (consumer == null)
+            otherData.setDisable(true);
+        else {
+            otherData.setOnAction(e -> consumer.accept(null));
+            otherData.setDisable(false);
         }
         return true;
     }

@@ -112,4 +112,8 @@ public interface MenuBarService {
         return false;
     }
 
+    default boolean setShowOtherDataAction(Consumer<Void> consumer) {
+        return false;
+    }
+
 }
