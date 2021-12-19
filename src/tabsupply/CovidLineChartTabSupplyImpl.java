@@ -15,7 +15,6 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import service.DataService;
 import service.ServiceFactory;
 import serviceimplements.NormalDataServiceImpl;
@@ -26,7 +25,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.IntSupplier;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static tabsupply.StandTabSupplyTool.getSelectionsBox;
