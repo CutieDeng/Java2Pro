@@ -19,10 +19,7 @@ import tool.Tool;
 import util.Holder;
 import view2.Tmp;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.*;
@@ -176,7 +173,7 @@ public class LocationTableTabSupplyImpl extends AbstractTabSupplyImpl {
 
                 tableRowTableView.setItems(searchList);
 
-                saveList = rows.stream().filter(d -> {
+                dataFilter = d -> {
                     if (d.fetch("location").contains(searchText))
                         return true;
                     if (d.fetch("iso code").startsWith(searchText))
@@ -184,7 +181,7 @@ public class LocationTableTabSupplyImpl extends AbstractTabSupplyImpl {
                     if (d.fetch("continent").contains(searchText))
                         return true;
                     return false;
-                }).map(Objects::toString).collect(Collectors.toList());
+                };
             };
         }
 
@@ -200,7 +197,7 @@ public class LocationTableTabSupplyImpl extends AbstractTabSupplyImpl {
 
     }
 
-    private static List<String> saveList;
+    private Predicate<Data> dataFilter = d -> true;
 
     private void exportAction() {
         Stage stage = new Stage();
@@ -212,31 +209,17 @@ public class LocationTableTabSupplyImpl extends AbstractTabSupplyImpl {
         fileChooser.setInitialFileName("LocationTable");
 
         //设置选择的文件的扩展名
-        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("txt", "*.txt"));
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("csv", "*.csv"),
+                new FileChooser.ExtensionFilter("txt", "*.txt"));
 
         //返回用户选中的文件的路径，注意，如果用户不选，则会返回null
         File file = fileChooser.showSaveDialog(stage);
 
         if (file == null) return;
 
-        try {
-            FileOutputStream fos = new FileOutputStream(file);
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fos);
-
-            if (searchField.getText().equals("")) {
-                for (Data data : service.getDataList()) {
-                    outputStreamWriter.write(data.toString() + "\n");
-                }
-            }
-            else {
-                for (String s : saveList) {
-                    outputStreamWriter.write(s + "\n");
-                    System.out.println("0");
-                }
-            }
-
-
-            outputStreamWriter.close();
+        try (PrintStream writer = new PrintStream(new BufferedOutputStream(new FileOutputStream(file)))) {
+            service.toStringStream(dataFilter).forEach(writer::println);
         } catch (IOException e) {
             e.printStackTrace();
         }
