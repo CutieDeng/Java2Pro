@@ -60,7 +60,7 @@ public class OtherTableDataImpl extends AbstractTabSupplyImpl {
         TableView<OtherTableRow> view = new TableView<>();
         view.setTableMenuButtonVisible(true);
 
-        final ToIntFunction<String> widthSupplier = str -> 80;
+        final ToIntFunction<String> widthSupplier = str -> 160;
 
         final Function<String, TableColumn<OtherTableRow, String>> colGenerator =
                 s -> {

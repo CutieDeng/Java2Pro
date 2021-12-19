@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -34,6 +35,15 @@ public class CovidLineAnimationSupplyImpl extends AbstractTabSupplyImpl {
         return null;
     }
 
+    private static final Supplier<Integer> cntSupplier = new Supplier<Integer>() {
+        int number = 1;
+        @Override
+        synchronized
+        public Integer get() {
+            return number++;
+        }
+    };
+
     private final DataService service = new NormalDataServiceImpl();
 
     private static final int minimum = 739352;
@@ -43,7 +53,13 @@ public class CovidLineAnimationSupplyImpl extends AbstractTabSupplyImpl {
 
     @Override
     public Tab supply(ServiceFactory factory) {
-        super.supply(factory);
+        // 初始化一个标签页
+        Tab ans = super.supply(factory);
+        ans.setText("Covid Line Chart Animation " + cntSupplier.get());
+
+        // 设置该标签页的提示信息
+        ans.setTooltip(new Tooltip("疫情折线动图"));
+
 
         BorderPane mainPane = new BorderPane();
         ans.setContent(mainPane);
