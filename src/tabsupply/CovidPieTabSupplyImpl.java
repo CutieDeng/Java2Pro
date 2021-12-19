@@ -22,8 +22,6 @@ public class CovidPieTabSupplyImpl extends AbstractTabSupplyImpl {
         }
     };
 
-
-
     final DataService service = new NormalDataServiceImpl();
 
     @Override

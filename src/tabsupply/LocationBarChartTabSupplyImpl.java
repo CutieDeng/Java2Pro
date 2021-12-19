@@ -2,7 +2,6 @@ package tabsupply;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
 import javafx.scene.chart.*;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Tab;
@@ -12,7 +11,6 @@ import javafx.scene.layout.VBox;
 import service.DataService;
 import service.ServiceFactory;
 import serviceimplements.HighDataServiceImpl;
-import tool.Tool;
 
 import java.util.List;
 import java.util.OptionalInt;
@@ -20,6 +18,8 @@ import java.util.function.Consumer;
 import java.util.function.IntSupplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static tabsupply.StandTabSupplyTool.getSelectionsBox;
 
 public class LocationBarChartTabSupplyImpl extends AbstractTabSupplyImpl{
 
@@ -58,14 +58,11 @@ public class LocationBarChartTabSupplyImpl extends AbstractTabSupplyImpl{
         ans.setContent(pane);
 
         {
-            VBox verticalBox = new VBox();
-            verticalBox.setPadding(new Insets(9.2));
-            verticalBox.setSpacing(9.2);
-            verticalBox.setPrefWidth(215.);
+            VBox verticalBox = getSelectionsBox();
             pane.setRight(verticalBox);
 
             List<String> names = service.getColumnNames().stream()
-                    .filter(name -> !"iso_code".equals(name) && !"location".equals(name) && !"continent".equals(name))
+                    .filter(StandTabSupplyTool::filterMainColName)
                     .collect(Collectors.toList());
 
             RadioButton[] buttons = new RadioButton[names.size()];
@@ -107,7 +104,7 @@ public class LocationBarChartTabSupplyImpl extends AbstractTabSupplyImpl{
                 group.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
                     OptionalInt any = IntStream.range(0, buttons.length).filter(b -> buttons[b].equals(newValue)).findAny();
                     if (any.isPresent()) {
-                        System.out.println("Now set the data from infoGroup[" + any.getAsInt() + "]. ");
+//                        Logger.global().info("Now set the data from infoGroup[" + any.getAsInt() + "]. ");
                         chart.getData().remove(0);
                         XYChart.Series<String, Number> series = new XYChart.Series<>();
                         series.setData(infoGroup[any.getAsInt()]);
