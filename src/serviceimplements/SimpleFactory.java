@@ -7,7 +7,7 @@ public class SimpleFactory implements ServiceFactory {
     private final MenuBarService menuBarService = new SimpleMenuBarServiceImpl();
     private final TipService tipService = new AmuseTipServiceImpl();
     private final TabPaneService tabPaneService = new SimpleTabPaneServiceImpl();
-    private final ShortcutService shortcutService = null;
+    private final ShortcutService shortCutService = null;
 
     @Override
     public MenuBarService getMenuBarService() {
@@ -26,6 +26,7 @@ public class SimpleFactory implements ServiceFactory {
 
     @Override
     public ShortcutService getShortcutService() {
-        return shortcutService;
+        //noinspection ConstantConditions
+        return shortCutService;
     }
 }

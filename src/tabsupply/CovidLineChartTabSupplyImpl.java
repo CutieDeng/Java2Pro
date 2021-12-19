@@ -87,7 +87,7 @@ public class CovidLineChartTabSupplyImpl extends AbstractTabSupplyImpl{
             x.setAnimated(false);
             y.setAnimated(false);
 
-            LineChart chart = new LineChart(x, y);
+            LineChart<String, Number> chart = new LineChart<>(x, y);
 
             beforeAction = v -> {
                 factory.getMenuBarService().setExportOnAction(v2 -> {

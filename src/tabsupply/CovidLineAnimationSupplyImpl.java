@@ -18,7 +18,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -108,18 +107,14 @@ public class CovidLineAnimationSupplyImpl extends AbstractTabSupplyImpl {
                 int n = newValue.intValue();
                 if (o == n)
                     return ;
-                if (o < n) {
-                    locationMap.forEach((s, stringNumberSeries) -> stringNumberSeries.getData().clear());
-                    Stream<String> validDates = dateList.stream().filter(d -> CovidLineChartTabSupplyImpl.dateTimeTransfer(d) < n);
-                    validDates.map(dateMap::get).flatMap(Collection::stream)
-                            .filter(d -> !"".equals(d.fetch(propertyName)))
-                            .forEach(d -> locationMap.get(d.fetch("location")).getData().add(new XYChart.Data<>(d.fetch("date"), Double.parseDouble(d.fetch(propertyName)))));
-                }
+                locationMap.forEach((s, stringNumberSeries) -> stringNumberSeries.getData().clear());
+                Stream<String> validDates = dateList.stream().filter(d -> CovidLineChartTabSupplyImpl.dateTimeTransfer(d) < n);
+                validDates.map(dateMap::get).flatMap(Collection::stream)
+                        .filter(d -> !"".equals(d.fetch(propertyName)))
+                        .forEach(d -> locationMap.get(d.fetch("location")).getData().add(new XYChart.Data<>(d.fetch("date"), Double.parseDouble(d.fetch(propertyName)))));
             });
 
-            Timeline animation = new Timeline(new KeyFrame(Duration.millis(100.), e -> {
-                rollbar.increment();
-            }));
+            Timeline animation = new Timeline(new KeyFrame(Duration.millis(100.), e -> rollbar.increment()));
             animation.setCycleCount(maximum - minimum + 1);
 
             propertiesButtons.forEach(b -> b.setOnAction(e -> {

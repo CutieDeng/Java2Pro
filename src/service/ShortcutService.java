@@ -8,5 +8,4 @@ package service;
  */
 public interface ShortcutService {
 
-
 }

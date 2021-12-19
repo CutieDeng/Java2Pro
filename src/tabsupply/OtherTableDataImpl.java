@@ -12,29 +12,22 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import service.DataService;
 import service.ServiceFactory;
 import serviceimplements.ColSpecialDataServiceImpl;
-import serviceimplements.HighDataServiceImpl;
-import serviceimplements.NormalDataServiceImpl;
-import tool.Controller;
 import tool.Tool;
 import util.Holder;
-import view2.OtherTableRow;
-import view2.Tmp;
+import RowInfo.OtherTableRow;
 
 import java.io.*;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.*;
-import java.util.logging.Logger;
 
+@SuppressWarnings({"RedundantIfStatement", "ResultOfMethodCallIgnored"})
 public class OtherTableDataImpl extends AbstractTabSupplyImpl {
     @Override
     protected Consumer<Void> getBeforeAction() {
@@ -92,10 +85,11 @@ public class OtherTableDataImpl extends AbstractTabSupplyImpl {
         return view;
     }
 
+    @SuppressWarnings("DuplicatedCode")
     @Override
     public Tab supply(ServiceFactory factory) {
         // 初始化一个标签页
-        Tab ans = super.supply(factory);
+        super.supply(factory);
         ans.setText("Other Covid Confirm Table " + cntSupplier.get());
 
         // 设置该标签页的提示信息
@@ -187,7 +181,7 @@ public class OtherTableDataImpl extends AbstractTabSupplyImpl {
             table.setPadding(new Insets(20));
 
             // 设置搜索会发生的事情
-            @SuppressWarnings("unchecked") final List<Data> rows = service.getDataList();
+            final List<Data> rows = service.getDataList();
 
             searchBoxActionHolder.obj = (searchText) -> {
                 ObservableList<OtherTableRow> searchList = FXCollections.observableArrayList();
@@ -214,13 +208,9 @@ public class OtherTableDataImpl extends AbstractTabSupplyImpl {
         }
 
         //文件导出
-        beforeAction = v -> {
-            factory.getMenuBarService()
-                    .setExportOnAction(e -> exportAction());
-        };
+        beforeAction = v -> factory.getMenuBarService()
+                .setExportOnAction(e -> exportAction());
         after = v -> factory.getMenuBarService().setExportOnAction(null);
-
-
 
         return ans;
 
@@ -234,7 +224,9 @@ public class OtherTableDataImpl extends AbstractTabSupplyImpl {
                 new FileChooser.ExtensionFilter("csv", "*.csv"),
                 new FileChooser.ExtensionFilter("txt", "*.txt"));
 
-        if (file == null) return;
+        //noinspection DuplicatedCode
+        if (file == null)
+            return;
 
         try (PrintStream writer = new PrintStream(new BufferedOutputStream(new FileOutputStream(file)))) {
             service.toStringStream(dataFilter).forEach(writer::println);

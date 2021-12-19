@@ -1,4 +1,4 @@
-package view2;
+package RowInfo;
 
 public interface Tmp {
 }

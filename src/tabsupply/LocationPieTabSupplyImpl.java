@@ -6,8 +6,6 @@ import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
@@ -15,25 +13,25 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import javafx.util.Duration;
 import service.DataService;
 import service.ServiceFactory;
 import serviceimplements.HighDataServiceImpl;
 
 import javax.imageio.ImageIO;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static tabsupply.StandTabSupplyTool.getSelectionsBox;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class LocationPieTabSupplyImpl extends AbstractTabSupplyImpl {
     @Override
     protected Consumer<Void> getBeforeAction() {
@@ -98,7 +96,7 @@ public class LocationPieTabSupplyImpl extends AbstractTabSupplyImpl {
         PieChart pieChart = new PieChart();
         viewPane.setCenter(pieChart);
 
-        Predicate<String> countryFilter = l -> l.startsWith("OWID");
+        Predicate<String> countryFilter = l -> l.startsWith("OWID") && !l.equals("OWID_WRL");
         final List<Data> data = service.getDataList().stream().filter(d -> {
 //            Logger.getGlobal().info(d.fetch("iso_code"));
             return countryFilter.test(d.fetch("iso_code"));
@@ -147,10 +145,8 @@ public class LocationPieTabSupplyImpl extends AbstractTabSupplyImpl {
         radioButtons.get(0).fire();
 
         //文件导出
-        beforeAction = v -> {
-            factory.getMenuBarService()
-                    .setExportOnAction(e -> exportAction());
-        };
+        beforeAction = v -> factory.getMenuBarService()
+                .setExportOnAction(e -> exportAction());
         after = v -> factory.getMenuBarService().setExportOnAction(null);
 
         return ans;

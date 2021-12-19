@@ -14,7 +14,6 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import javafx.util.Duration;
 import service.DataService;
 import service.ServiceFactory;
@@ -32,6 +31,7 @@ import java.util.stream.IntStream;
 
 import static tabsupply.StandTabSupplyTool.getSelectionsBox;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class LocationBarChartTabSupplyImpl extends AbstractTabSupplyImpl{
     @Override
     protected Consumer<Void> getBeforeAction() {
@@ -47,9 +47,9 @@ public class LocationBarChartTabSupplyImpl extends AbstractTabSupplyImpl{
     private Consumer<Void> after;
 
 
-    private DataService service = new HighDataServiceImpl();
+    private final DataService service = new HighDataServiceImpl();
 
-    private static IntSupplier cntSupplier = new IntSupplier() {
+    private static final IntSupplier cntSupplier = new IntSupplier() {
         private int cnt = 1;
         @Override
         public int getAsInt() {
@@ -96,7 +96,7 @@ public class LocationBarChartTabSupplyImpl extends AbstractTabSupplyImpl{
 
                 XYChart.Series<String, Number> allData = new XYChart.Series<>();
                 chart.getData().add(allData);
-                ObservableList[] infoGroup = new ObservableList[buttons.length];
+                @SuppressWarnings("unchecked") ObservableList<XYChart.Data<String, Number>>[] infoGroup = new ObservableList[buttons.length];
                 for (int i = 0; i < buttons.length; i++) {
                     int finalI = i;
                     infoGroup[finalI] = FXCollections.observableArrayList();
@@ -141,13 +141,9 @@ public class LocationBarChartTabSupplyImpl extends AbstractTabSupplyImpl{
 
         }
 
-
-
         //文件导出
-        beforeAction = v -> {
-            factory.getMenuBarService()
-                    .setExportOnAction(e -> exportAction());
-        };
+        beforeAction = v -> factory.getMenuBarService()
+                .setExportOnAction(e -> exportAction());
         after = v -> factory.getMenuBarService().setExportOnAction(null);
 
         return ans;

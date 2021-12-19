@@ -1,14 +1,12 @@
 package tool;
 
+import RowInfo.Tmp;
 import data.Data;
 import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import util.Holder;
-import view2.Tmp;
 
-import javax.tools.JavaCompiler;
-import javax.tools.ToolProvider;
 import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -21,11 +19,10 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("unused")
 public final class Tool {
 
     public static List<Data> readDataFile(File file) {
@@ -33,9 +30,9 @@ public final class Tool {
     }
 
     public static List<Data> readDataFile(File file, Holder<List<String>> cols) {
-        List<Data> result = null;
+        List<Data> result;
         try {
-            Class<?> main = Class.forName("Main");
+            Class<?> main = Class.forName("RowInfo.FirstVersionRowAttempt");
             Method readMethod = main.getDeclaredMethod("read", File.class);
             readMethod.setAccessible(true);
             //noinspection unchecked
@@ -117,7 +114,8 @@ public final class Tool {
         char[] chars = name.toCharArray();
         StringBuilder ans = new StringBuilder();
         boolean numberFlag = false;
-        // todo: 内含大量 BUG!
+
+        // ...
         for (char c : chars) {
             if (c >= 'A' && c <= 'Z')
                 ans.append(' ').append((char)(c + 'a' - 'A'));
@@ -141,6 +139,7 @@ public final class Tool {
 
     private static boolean createClassFlag = false;
 
+    @SuppressWarnings("UnusedReturnValue")
     synchronized
     public static boolean createClass(List<String> stringProperties, List<String> intProperties, List<String> doubleProperties) {
         if (createClassFlag)
@@ -209,10 +208,10 @@ public final class Tool {
             e.printStackTrace();
             return false;
         }
-        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-        compiler.run(null, null, null, "src/view2/TmpRow.java");
+//        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+//        compiler.run(null, null, null, "src/view2/TmpRow.java");
         try {
-            Class.forName("view2.TmpRow");
+            Class.forName("RowInfo.TmpRow");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
             System.exit(-1);
@@ -224,7 +223,7 @@ public final class Tool {
 
     public static Tmp createRow(Data data) {
         try {
-            Class<?> aClass = Class.forName("view2.TmpRow");
+            Class<?> aClass = Class.forName("RowInfo.TmpRow");
             Constructor<?> declaredConstructor = aClass.getDeclaredConstructor(Data.class);
             return (Tmp) declaredConstructor.newInstance(data);
         } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
@@ -232,22 +231,4 @@ public final class Tool {
             return null;
         }
     }
-
-    /**
-     *
-     * @param tmp 传入一个tmp对象
-     * @return 返回一个Map, 规定：不能返回null
-     *          map里有3个key: location, iso, date
-     *          其中date的格式为“xxxx-xx-xx”
-     *
-     */
-    public static Map<String, String> getSearchProperties(Tmp tmp) {
-        return null;
-    }
-
-    public static String toString(Data data, List<String> colNames) {
-        return colNames.stream().map(data::fetch).collect(Collectors.joining(","));
-    }
-
-
 }

@@ -1,7 +1,5 @@
 package service;
 
-import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.scene.control.MenuBar;
 
 import java.util.function.Consumer;
@@ -32,6 +30,7 @@ import java.util.function.Consumer;
  * <p/>
  */
 
+@SuppressWarnings({"UnusedReturnValue", "unused"})
 public interface MenuBarService {
 
     /**

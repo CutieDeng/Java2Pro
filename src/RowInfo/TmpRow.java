@@ -1,4 +1,4 @@
-package view2;
+package RowInfo;
 
 import data.Data;
 import javafx.beans.property.*;
@@ -8,6 +8,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+@SuppressWarnings("all")
 public class TmpRow implements Tmp{
 private final StringProperty isoCode = new SimpleStringProperty(); 
 private final StringProperty continent = new SimpleStringProperty(); 

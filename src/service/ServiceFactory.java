@@ -16,6 +16,7 @@ package service;
  * 请注意任何一个工厂都应只提供单例的服务使用，以避免多实例造成的混乱。<br>
  * <p/>
  */
+@SuppressWarnings("unused")
 public interface ServiceFactory {
     MenuBarService getMenuBarService();
     TipService getTipService();

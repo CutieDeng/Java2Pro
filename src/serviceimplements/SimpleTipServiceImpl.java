@@ -8,6 +8,7 @@ import service.TipService;
 
 import java.util.function.Consumer;
 
+@SuppressWarnings("unused")
 public class SimpleTipServiceImpl implements TipService {
 
     private HBox box;

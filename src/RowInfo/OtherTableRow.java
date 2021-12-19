@@ -1,4 +1,4 @@
-package view2;
+package RowInfo;
 
 import data.Data;
 import javafx.beans.property.IntegerProperty;
@@ -6,8 +6,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import java.text.DateFormat;
-
+@SuppressWarnings("all")
 public class OtherTableRow {
     private final StringProperty province = new SimpleStringProperty();
     private final StringProperty location = new SimpleStringProperty();

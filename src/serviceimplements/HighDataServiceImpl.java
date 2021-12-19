@@ -13,7 +13,7 @@ public class HighDataServiceImpl implements DataService {
 
     private static final File dataFile = Paths.get("res", "file", "owid-covid-data.csv").toFile();
 
-    private FileController c;
+    private final FileController c;
 
     public HighDataServiceImpl() {
         c = Controller.instance.getFileData(dataFile);

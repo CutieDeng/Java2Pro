@@ -2,8 +2,6 @@ package service;
 
 import javafx.scene.Node;
 
-import java.util.function.Consumer;
-
 /**
  * 提示框相关服务<br>
  * <p/>
@@ -69,6 +67,7 @@ public interface TipService {
      *
       * @param prompt 缺省的提示字符串信息
      */
+    @SuppressWarnings("unused")
     default void init(String prompt) {
         init();
     }

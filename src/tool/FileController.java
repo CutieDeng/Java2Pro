@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 public class FileController {
 
+    @SuppressWarnings({"FieldCanBeLocal", "unused"})
     private final File dataFile;
 
     FileController(File dataFile) {

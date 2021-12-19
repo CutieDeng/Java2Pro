@@ -1,13 +1,6 @@
+package RowInfo;
+
 import data.Data;
-import javafx.application.Application;
-import javafx.scene.Group;
-import javafx.scene.Scene;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
-import javafx.stage.Stage;
-import tool.Tool;
-import view2.Launch;
 
 import java.io.*;
 import java.math.BigDecimal;
@@ -18,74 +11,8 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class Main extends Application{
-
-    public static void main(String[] args) throws FileNotFoundException {
-        List<Data> l = Tool.readDataFile(Paths.get("res", "file", "owid-covid-data.csv").toFile());
-        l.stream().limit(20).forEach(System.out::println);
-        l.stream().map(i -> i.fetch("iso code")).forEach(System.out::println);
-        System.out.println("Hello World!");
-        launch(Launch.class, args);
-        System.exit(0);
-//        List<Row> rows = read(Paths.get("res", "file", "owid-covid-data.csv").toFile());
-//        graph01();
-    }
-
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-        {
-            NumberAxis x = new NumberAxis("x", 0, 70, 10);
-            NumberAxis y = new NumberAxis("y", 0, 15, 1);
-            LineChart<Number, Number> lineChart = new LineChart<>(x, y);
-            XYChart.Series<Number, Number> series = new XYChart.Series<>();
-            series.setName("Series name");
-
-            @SuppressWarnings("unchecked") XYChart.Data<Number, Number>[] data = new XYChart.Data[] {
-                    new XYChart.Data<Number, Number>(3, 4),
-                    new XYChart.Data<Number, Number>(5, 4),
-                    new XYChart.Data<Number, Number>(6, 7),
-                    new XYChart.Data<Number, Number>(10, 3),
-                    new XYChart.Data<Number, Number>(13, 4),
-                    new XYChart.Data<Number, Number>(14, 1),
-                    new XYChart.Data<Number, Number>(15, 5),
-                    new XYChart.Data<Number, Number>(16, 6),
-                    new XYChart.Data<Number, Number>(37, 2),
-                    new XYChart.Data<Number, Number>(38, 2),
-                    new XYChart.Data<Number, Number>(39, 3),
-                    new XYChart.Data<Number, Number>(40, 4),
-                    new XYChart.Data<Number, Number>(43, 5),
-                    new XYChart.Data<Number, Number>(48, 3),
-                    new XYChart.Data<Number, Number>(50, 2),
-                    new XYChart.Data<Number, Number>(53, 6),
-                    new XYChart.Data<Number, Number>(57, 3),
-                    new XYChart.Data<Number, Number>(59, 3),
-                    new XYChart.Data<Number, Number>(17, 8),
-                    new XYChart.Data<Number, Number>(19, 10),
-                    new XYChart.Data<Number, Number>(22, 5),
-                    new XYChart.Data<Number, Number>(24, 2),
-                    new XYChart.Data<Number, Number>(26, 1),
-                    new XYChart.Data<Number, Number>(28, 3),
-                    new XYChart.Data<Number, Number>(29, 3),
-                    new XYChart.Data<Number, Number>(33, 4),
-                    new XYChart.Data<Number, Number>(36, 2),
-                    new XYChart.Data<Number, Number>(65, 3),
-                    new XYChart.Data<Number, Number>(70, 2),
-            };
-            series.getData().addAll(data);
-
-            lineChart.getData().add(series);
-            series.setName("Line 1");
-
-            final Group root = new Group(lineChart);
-
-            final Scene scene = new Scene(root, 600, 400);
-
-            primaryStage.setTitle("graph!");
-            primaryStage.setScene(scene);
-
-            primaryStage.show();
-        }
-    }
+@SuppressWarnings("unused")
+public class FirstVersionRowAttempt {
 
     /**
      * 一个粗糙的信息条目类
@@ -155,8 +82,6 @@ public class Main extends Application{
                         .collect(Collectors.joining(", ")));
         }
 
-        // IDE tips bug: any.isEmpty() doesn't exist.
-        @SuppressWarnings("SimplifyOptionalCallChains")
         @Override
         public String fetch(String property) {
             String match = property.toLowerCase(Locale.ROOT).replace('_', ' ');
@@ -170,22 +95,11 @@ public class Main extends Application{
     }
 
     private static Map<String, Set<String>> compareIndex(List<Row> rows, int i) {
-        return rows.stream().collect(HashMap<String, Set<String>>::new, (p, r) -> {
+        return rows.stream().collect(HashMap::new, (p, r) -> {
             if (!p.containsKey(r.row[0]))
                 p.put(r.row[0], new HashSet<>());
             p.get(r.row[0]).add(r.row[i]);
         }, HashMap::putAll);
-    }
-
-
-    /**
-     * 该方法用于分析 reproduction rate. <br>
-     * <p/>
-     *
-     *
-     */
-    private static void graph01() {
-        launch();
     }
 
     /**
@@ -264,7 +178,7 @@ public class Main extends Application{
         try (BufferedReader input = new BufferedReader(new InputStreamReader(new FileInputStream(file)))) {
             Row.initColName(input.readLine());
             return input.lines().filter(Objects::nonNull)
-                    .map(Row::new).filter(r -> r.fetch("date").matches("2020-0[1-6]-\\d{2}")).collect(Collectors.toList());
+                    .map(Row::new).filter(r -> Objects.requireNonNull(r.fetch("date")).matches("2020-0[1-6]-\\d{2}")).collect(Collectors.toList());
         } catch (IOException e) {
             logger.severe(e.getMessage());
             return null;

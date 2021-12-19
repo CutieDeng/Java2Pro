@@ -3,8 +3,6 @@ package tool;
 import data.Data;
 
 import java.io.*;
-import java.text.DateFormat;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -12,8 +10,8 @@ import java.util.stream.Collectors;
 
 public class Col2RowController {
 
-    private List<Data> data = new ArrayList<>();
-    private List<String> columnNames = Arrays.stream(new String[]{
+    private final List<Data> data = new ArrayList<>();
+    private final List<String> columnNames = Arrays.stream(new String[]{
             "province", "location", "date", "confirm"
     }).collect(Collectors.toList());
 

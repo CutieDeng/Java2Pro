@@ -12,23 +12,20 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import service.DataService;
 import service.ServiceFactory;
-import serviceimplements.HighDataServiceImpl;
 import serviceimplements.NormalDataServiceImpl;
 import tool.Tool;
 import util.Holder;
-import view2.Tmp;
+import RowInfo.Tmp;
 
 import java.io.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.*;
 
+@SuppressWarnings({"RedundantIfStatement", "ResultOfMethodCallIgnored"})
 public class CovidTableTabSupplyImpl extends AbstractTabSupplyImpl {
     @Override
     protected Consumer<Void> getBeforeAction() {
@@ -149,7 +146,7 @@ public class CovidTableTabSupplyImpl extends AbstractTabSupplyImpl {
             searchField.setOnAction(e -> searchAction.accept(searchField.getText()));
             searchConfirmButton.setOnAction(e -> searchAction.accept(searchField.getText()));
 
-            //todo: 还想不到好的GUI设计，暂时这样呈现，有点点丑
+            // ...
             DatePicker datePicker = new DatePicker(LocalDate.now());
             datePicker.setEditable(false);
             searchBox.getChildren().add(datePicker);
@@ -169,14 +166,13 @@ public class CovidTableTabSupplyImpl extends AbstractTabSupplyImpl {
 
         // 创建表的相关操作
         {
-            @SuppressWarnings("unchecked")
             TableView<Tmp> tableRowTableView = initTableView(service.getColumnNames(), service.getDataList());
             viewPane.setCenter(tableRowTableView);
             // 稍稍设置一下相关的图形参数吧，让它好看点
             tableRowTableView.setPadding(new Insets(20));
 
             // 设置搜索会发生的事情
-            @SuppressWarnings("unchecked") final List<Data> rows = service.getDataList();
+            final List<Data> rows = service.getDataList();
 
             searchBoxActionHolder.obj = (searchText) -> {
                 ObservableList<Tmp> searchList = FXCollections.observableArrayList();
@@ -207,13 +203,9 @@ public class CovidTableTabSupplyImpl extends AbstractTabSupplyImpl {
         }
 
         //文件导出
-        beforeAction = v -> {
-            factory.getMenuBarService()
-                    .setExportOnAction(e -> exportAction());
-        };
+        beforeAction = v -> factory.getMenuBarService()
+                .setExportOnAction(e -> exportAction());
         after = v -> factory.getMenuBarService().setExportOnAction(null);
-
-
 
         return ans;
 
@@ -222,7 +214,7 @@ public class CovidTableTabSupplyImpl extends AbstractTabSupplyImpl {
     private Predicate<Data> dataFilter = d -> true;
 
     private void exportAction() {
-        File file = StandTabSupplyTool.getChooseFile(new FileChooser(), "CovidTable",
+        @SuppressWarnings("DuplicatedCode") File file = StandTabSupplyTool.getChooseFile(new FileChooser(), "CovidTable",
                 new FileChooser.ExtensionFilter("csv", "*.csv"),
                 new FileChooser.ExtensionFilter("txt", "*.txt"));
 
