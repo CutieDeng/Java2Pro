@@ -53,6 +53,7 @@ public class Entrance extends Application {
             factory.getMenuBarService().setShowCovidLineOnAction(v -> selectNewTab(factory, () -> new CovidLineChartTabSupplyImpl().supply(factory)).accept(null));
             factory.getMenuBarService().setShowLocationPieOnAction(v -> selectNewTab(factory, () -> new LocationPieTabSupplyImpl().supply(factory)).accept(null));
             factory.getMenuBarService().setShowCovidLineAnimatedOnAction(v -> selectNewTab(factory, () -> new CovidLineAnimationSupplyImpl().supply(factory)).accept(null));
+            factory.getMenuBarService().setShowOtherDataAction(v -> selectNewTab(factory, () -> new OtherTableDataImpl().supply(factory)).accept(null));
         }
 
         // 快捷键硬编码 qwq

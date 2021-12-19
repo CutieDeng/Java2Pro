@@ -15,19 +15,25 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import service.DataService;
 import service.ServiceFactory;
+import serviceimplements.ColSpecialDataServiceImpl;
 import serviceimplements.HighDataServiceImpl;
 import serviceimplements.NormalDataServiceImpl;
+import tool.Controller;
 import tool.Tool;
 import util.Holder;
+import view2.OtherTableRow;
 import view2.Tmp;
 
 import java.io.*;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.*;
+import java.util.logging.Logger;
 
 public class OtherTableDataImpl extends AbstractTabSupplyImpl {
     @Override
@@ -57,8 +63,34 @@ public class OtherTableDataImpl extends AbstractTabSupplyImpl {
         }
     };
 
+    private static TableView<OtherTableRow> initTableView(List<String> colNames, List<Data> datas) {
+        TableView<OtherTableRow> view = new TableView<>();
+        view.setTableMenuButtonVisible(true);
 
+        final ToIntFunction<String> widthSupplier = str -> 80;
 
+        final Function<String, TableColumn<OtherTableRow, String>> colGenerator =
+                s -> {
+                    final TableColumn<OtherTableRow, String> col = new TableColumn<>(s);
+                    col.setCellValueFactory(new PropertyValueFactory<>(s));
+                    col.setPrefWidth(widthSupplier.applyAsInt(s));
+                    return col;
+                };
+        colNames.forEach(cn -> view.getColumns().add(colGenerator.apply(Tool.transferReverse(cn))));
+
+        ObservableList<OtherTableRow> dataList = FXCollections.observableArrayList();
+        datas.stream().map(
+                d -> {
+                    try {
+                        return new OtherTableRow(d);
+                    } catch (RuntimeException e) {
+//                        Logger.getGlobal().warning(e.getMessage());
+                        return null;
+                    }
+                }).filter(Objects::nonNull).forEach(dataList::add);
+        view.setItems(dataList);
+        return view;
+    }
 
     @Override
     public Tab supply(ServiceFactory factory) {
@@ -147,7 +179,37 @@ public class OtherTableDataImpl extends AbstractTabSupplyImpl {
 
         // 创建表的相关操作
         {
-            //todo
+            File dataFile = Paths.get("res", "file", "time_series_covid19_confirmed_global.csv").toFile();
+            service = new ColSpecialDataServiceImpl(dataFile);
+            TableView<OtherTableRow> table = initTableView(service.getColumnNames(), service.getDataList());
+            viewPane.setCenter(table);
+            // 稍稍设置一下相关的图形参数吧，让它好看点
+            table.setPadding(new Insets(20));
+
+            // 设置搜索会发生的事情
+            @SuppressWarnings("unchecked") final List<Data> rows = service.getDataList();
+
+            searchBoxActionHolder.obj = (searchText) -> {
+                ObservableList<OtherTableRow> searchList = FXCollections.observableArrayList();
+
+                rows.stream().filter(d -> {
+                    if (d.fetch("location").contains(searchText))
+                        return true;
+                    if (d.fetch("date").equals(searchText))
+                        return true;
+                    return false;
+                }).map(OtherTableRow::new).forEach(searchList::add);
+
+                table.setItems(searchList);
+
+                dataFilter = d -> {
+                    if (d.fetch("location").contains(searchText))
+                        return true;
+                    if (d.fetch("date").equals(searchText))
+                        return true;
+                    return false;
+                };
+            };
 
         }
 
@@ -164,6 +226,8 @@ public class OtherTableDataImpl extends AbstractTabSupplyImpl {
 
     }
 
+    private Predicate<Data> dataFilter = d -> true;
+    private DataService service;
 
     private void exportAction() {
         File file = StandTabSupplyTool.getChooseFile(new FileChooser(), "CovidTable",
@@ -173,7 +237,7 @@ public class OtherTableDataImpl extends AbstractTabSupplyImpl {
         if (file == null) return;
 
         try (PrintStream writer = new PrintStream(new BufferedOutputStream(new FileOutputStream(file)))) {
-            //todo
+            service.toStringStream(dataFilter).forEach(writer::println);
         } catch (IOException e) {
             e.printStackTrace();
         }
