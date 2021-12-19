@@ -3,6 +3,9 @@ package service;
 import data.Data;
 
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 数据相关服务者负责掌控一个文件-层级的数据信息。<br>
@@ -29,4 +32,10 @@ public interface DataService {
      * @return 其托管的数据表格的列名
      */
     List<String> getColumnNames();
+
+    default Stream<String> toStringStream(Predicate<Data> filterData) {
+        String title = String.join(",", getColumnNames());
+        return Stream.concat(Stream.of(title),
+            getDataList().stream().filter(filterData).map(d -> getColumnNames().stream().map(d::fetch).collect(Collectors.joining(","))));
+    }
 }
