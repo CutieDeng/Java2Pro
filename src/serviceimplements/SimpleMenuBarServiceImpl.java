@@ -24,6 +24,7 @@ public class SimpleMenuBarServiceImpl implements MenuBarService {
     private MenuItem showCovidBar;
     private MenuItem showCovidPie;
     private MenuItem showCovidLine;
+    private MenuItem showCovidLineAnimated;
 
     @Override
     public void init() {
@@ -72,13 +73,16 @@ public class SimpleMenuBarServiceImpl implements MenuBarService {
             showCovidBar = new MenuItem("条形图");
             showCovidPie = new MenuItem("饼状图");
             showCovidLine = new MenuItem("折线图");
+            showCovidLineAnimated = new MenuItem("折线动图");
 
             showCovidTable.setDisable(true);
             showCovidBar.setDisable(true);
             showCovidPie.setDisable(true);
             showCovidLine.setDisable(true);
+            showCovidLineAnimated.setDisable(true);
 
-            view.getItems().addAll(covidLevel, showCovidTable, showCovidBar, showCovidPie, showCovidLine, new SeparatorMenuItem());
+            view.getItems().addAll(covidLevel, showCovidTable, showCovidBar, showCovidPie, showCovidLine, showCovidLineAnimated,
+                    new SeparatorMenuItem());
         }
     }
 
@@ -182,6 +186,17 @@ public class SimpleMenuBarServiceImpl implements MenuBarService {
         else {
             showCovidLine.setOnAction(e -> consumer.accept(null));
             showCovidLine.setDisable(false);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean setShowCovidLineAnimatedOnAction(Consumer<Void> consumer) {
+        if (consumer == null) {
+            showCovidLineAnimated.setDisable(true);
+        } else {
+            showCovidLineAnimated.setOnAction(e -> consumer.accept(null));
+            showCovidLineAnimated.setDisable(false);
         }
         return true;
     }
