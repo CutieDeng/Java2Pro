@@ -83,7 +83,10 @@ public class SimpleMenuBarServiceImpl implements MenuBarService {
             showCovidLine.setDisable(true);
             showCovidLineAnimated.setDisable(true);
 
-            view.getItems().addAll(covidLevel, showCovidTable, showCovidBar, showCovidPie, showCovidLine, showCovidLineAnimated,
+            view.getItems().addAll(covidLevel, showCovidTable,
+//                    showCovidBar,
+//                    showCovidPie,
+                    showCovidLine, showCovidLineAnimated,
                     new SeparatorMenuItem());
         }
 

@@ -58,7 +58,7 @@ public class Col2RowController {
                 String[] split1 = d.split(",");
                 String province = split1[0];
                 String location = split1[1];
-                for (int i = 2; i < split.length; i++) {
+                for (int i = 2+2; i < split.length; i++) {
                     data.add(new SpecialOneColumnData(province, location, split[i], split1[i]));
                 }
             });
