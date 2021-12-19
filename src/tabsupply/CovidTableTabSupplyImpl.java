@@ -11,6 +11,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import service.DataService;
 import service.ServiceFactory;
 import serviceimplements.HighDataServiceImpl;
@@ -19,17 +21,32 @@ import tool.Tool;
 import util.Holder;
 import view2.Tmp;
 
+import java.io.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.function.ToIntFunction;
+import java.util.function.*;
 
 public class CovidTableTabSupplyImpl extends AbstractTabSupplyImpl {
+    @Override
+    protected Consumer<Void> getBeforeAction() {
+        return beforeAction;
+    }
+
+    @Override
+    protected Consumer<Void> getAfterAllAction() {
+        return after;
+    }
+
+    private Consumer<Void> beforeAction;
+    private Consumer<Void> after;
+
+    @Override
+    protected Tab tabGenerate() {
+        return super.tabGenerate();
+    }
 
     private static final Supplier<Integer> cntSupplier = new Supplier<Integer>() {
         int number = 1;
@@ -63,15 +80,6 @@ public class CovidTableTabSupplyImpl extends AbstractTabSupplyImpl {
 
     final DataService service = new NormalDataServiceImpl();
 
-    @Override
-    protected Consumer<Void> getBeforeAction() {
-        return null;
-    }
-
-    @Override
-    protected Consumer<Void> getAfterAllAction() {
-        return null;
-    }
 
     @Override
     public Tab supply(ServiceFactory factory) {
@@ -176,7 +184,7 @@ public class CovidTableTabSupplyImpl extends AbstractTabSupplyImpl {
                 rows.stream().filter(d -> {
                     if (d.fetch("location").contains(searchText))
                         return true;
-                    if (d.fetch("iso code").contains(searchText))
+                    if (d.fetch("iso code").startsWith(searchText))
                         return true;
                     if (d.fetch("date").equals(searchText))
                         return true;
@@ -184,13 +192,65 @@ public class CovidTableTabSupplyImpl extends AbstractTabSupplyImpl {
                 }).map(Tool::createRow).forEach(searchList::add);
 
                 tableRowTableView.setItems(searchList);
+
+                dataFilter = d -> {
+                    if (d.fetch("location").contains(searchText))
+                        return true;
+                    if (d.fetch("iso code").startsWith(searchText))
+                        return true;
+                    if (d.fetch("date").equals(searchText))
+                        return true;
+                    return false;
+                };
             };
 
         }
+
+        //文件导出
+        beforeAction = v -> {
+            factory.getMenuBarService()
+                    .setExportOnAction(e -> exportAction());
+        };
+        after = v -> factory.getMenuBarService().setExportOnAction(null);
 
 
 
         return ans;
 
+    }
+
+    private Predicate<Data> dataFilter = d -> true;
+
+    private void exportAction() {
+        Stage stage = new Stage();
+        FileChooser fileChooser = new FileChooser();
+
+        fileChooser.setTitle("save one file");
+
+        //默认文件名
+        fileChooser.setInitialFileName("CovidTable");
+
+        //设置选择的文件的扩展名
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("csv", "*.csv"),
+                new FileChooser.ExtensionFilter("txt", "*.txt"));
+
+        //返回用户选中的文件的路径，注意，如果用户不选，则会返回null
+        File file = fileChooser.showSaveDialog(stage);
+
+        if (file == null) return;
+
+        try (PrintStream writer = new PrintStream(new BufferedOutputStream(new FileOutputStream(file)))) {
+            service.toStringStream(dataFilter).forEach(writer::println);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        try {
+            file.createNewFile();//如果保存的文件没有数据，则需要这句话。否则，不需要
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

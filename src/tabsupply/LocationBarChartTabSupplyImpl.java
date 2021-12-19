@@ -1,17 +1,28 @@
 package tabsupply;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.*;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Tab;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import javafx.util.Duration;
 import service.DataService;
 import service.ServiceFactory;
 import serviceimplements.HighDataServiceImpl;
 
+import javax.imageio.ImageIO;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.OptionalInt;
 import java.util.function.Consumer;
@@ -22,16 +33,19 @@ import java.util.stream.IntStream;
 import static tabsupply.StandTabSupplyTool.getSelectionsBox;
 
 public class LocationBarChartTabSupplyImpl extends AbstractTabSupplyImpl{
-
     @Override
     protected Consumer<Void> getBeforeAction() {
-        return null;
+        return beforeAction;
     }
 
     @Override
     protected Consumer<Void> getAfterAllAction() {
-        return null;
+        return after;
     }
+
+    private Consumer<Void> beforeAction;
+    private Consumer<Void> after;
+
 
     private DataService service = new HighDataServiceImpl();
 
@@ -110,7 +124,16 @@ public class LocationBarChartTabSupplyImpl extends AbstractTabSupplyImpl{
                         series.setData(infoGroup[any.getAsInt()]);
                         chart.getData().add(series);
                     }
+
+                    waitTwoSeconds.play();
+
                 });
+
+                {
+                    waitTwoSeconds = new Timeline(new KeyFrame(Duration.seconds(2),
+                            event -> writableImage = chart.snapshot(new SnapshotParameters(), null)));
+                    waitTwoSeconds.setCycleCount(1);
+                }
             }
 
             group.getToggles().addAll(buttons);
@@ -118,6 +141,50 @@ public class LocationBarChartTabSupplyImpl extends AbstractTabSupplyImpl{
 
         }
 
+
+
+        //文件导出
+        beforeAction = v -> {
+            factory.getMenuBarService()
+                    .setExportOnAction(e -> exportAction());
+        };
+        after = v -> factory.getMenuBarService().setExportOnAction(null);
+
         return ans;
+    }
+
+    private Timeline waitTwoSeconds;
+
+    WritableImage writableImage;
+
+    private void exportAction() {
+        Stage stage = new Stage();
+        FileChooser fileChooser = new FileChooser();
+
+        fileChooser.setTitle("save one file");
+
+        //默认文件名
+        fileChooser.setInitialFileName("LocationBarChart");
+
+        //设置选择的文件的扩展名
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("image", "*.png"));
+
+        //返回用户选中的文件的路径，注意，如果用户不选，则会返回null
+        File file = fileChooser.showSaveDialog(stage);
+
+        if (file == null) return;
+
+        try {
+            ImageIO.write(SwingFXUtils.fromFXImage(writableImage, null), "png", file);
+        } catch (Exception s) {
+            s.printStackTrace();
+        }
+
+        try {
+            file.createNewFile();//如果保存的文件没有数据，则需要这句话。否则，不需要
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

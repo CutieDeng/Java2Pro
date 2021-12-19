@@ -2,6 +2,10 @@ package tabsupply;
 
 import javafx.geometry.Insets;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+
+import java.io.File;
 
 public final class StandTabSupplyTool {
 
