@@ -3,6 +3,8 @@ package tool;
 import data.Data;
 
 import java.io.*;
+import java.text.DateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -54,12 +56,52 @@ public class Col2RowController {
     Col2RowController(File file) {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)))){
             String[] split = reader.readLine().split(",");
+            for (int i = 2+2; i < split.length; i++) {
+                char[] tmpChars = split[i].toCharArray();
+                int index = 0;
+                int month = 0;
+                while (index < tmpChars.length) {
+                    if (tmpChars[index] < '0' || tmpChars[index] > '9')
+                        break;
+                    month = (month * 10) + tmpChars[index] - '0';
+                    index++;
+                }
+                index++;
+                int day = 0;
+                while (index < tmpChars.length) {
+                    if (tmpChars[index] < '0' || tmpChars[index] > '9')
+                        break;
+                    day = day * 10 + tmpChars[index] - '0';
+                    index++;
+                }
+                index++;
+                int year = 20;
+                while (index < tmpChars.length) {
+                    if (tmpChars[index] < '0' || tmpChars[index] > '9')
+                        break;
+                    year = year * 10 + tmpChars[index] - '0';
+                    index++;
+                }
+                assert (year >= 1000 && year <= 9999);
+                StringBuilder builder = new StringBuilder().append(year).append("-");
+                if (month < 10)
+                    builder.append("0");
+                builder.append(month).append("-");
+                if (day < 10)
+                    builder.append("0");
+                builder.append(day);
+                split[i] = builder.toString();
+            }
             reader.lines().forEach(d -> {
                 String[] split1 = d.split(",");
                 String province = split1[0];
                 String location = split1[1];
-                for (int i = 2; i < split.length; i++) {
-                    data.add(new SpecialOneColumnData(province, location, split[i], split1[i]));
+                for (int i = 2+2; i < split.length; i++) {
+                    try {
+                        Integer.parseInt(split1[i]);
+                        data.add(new SpecialOneColumnData(province, location, split[i], split1[i]));
+                    } catch (RuntimeException e) {
+                    }
                 }
             });
         } catch (IOException e) {
