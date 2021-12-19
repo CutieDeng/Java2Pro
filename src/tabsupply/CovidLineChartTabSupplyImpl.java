@@ -5,16 +5,24 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.*;
 import javafx.scene.control.*;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import service.DataService;
 import service.ServiceFactory;
 import serviceimplements.NormalDataServiceImpl;
 
+import javax.imageio.ImageIO;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.IntSupplier;
@@ -32,12 +40,16 @@ public class CovidLineChartTabSupplyImpl extends AbstractTabSupplyImpl{
 
     @Override
     protected Consumer<Void> getBeforeAction() {
-        return null;
+        return beforeAction;
     }
+
+    private Consumer<Void> beforeAction;
+
+    private Consumer<Void> afterAll;
 
     @Override
     protected Consumer<Void> getAfterAllAction() {
-        return null;
+        return afterAll;
     }
 
     private final DataService service = new NormalDataServiceImpl();
@@ -78,6 +90,16 @@ public class CovidLineChartTabSupplyImpl extends AbstractTabSupplyImpl{
             y.setAnimated(false);
 
             LineChart chart = new LineChart(x, y);
+
+            beforeAction = v -> {
+                factory.getMenuBarService().setExportOnAction(v2 -> {
+                    WritableImage tmpSnap = chart.snapshot(new SnapshotParameters(), null);
+                    exportAction(tmpSnap);
+                });
+            };
+            afterAll = v -> factory.getMenuBarService().setExportOnAction(null);
+
+
             graphRelatedPane.setCenter(chart);
 
             chart.setAnimated(false);
@@ -223,6 +245,25 @@ public class CovidLineChartTabSupplyImpl extends AbstractTabSupplyImpl{
         }
 
         return ans;
+    }
+
+    private void exportAction(WritableImage writableImage) {
+        File file = StandTabSupplyTool.getChooseFile(new FileChooser(), "CovidLineChart",
+                new FileChooser.ExtensionFilter("image", "*.png"));
+
+        if (file == null) return;
+
+        try {
+            ImageIO.write(SwingFXUtils.fromFXImage(writableImage, null), "png", file);
+        } catch (Exception s) {
+            s.printStackTrace();
+        }
+
+        try {
+            file.createNewFile();//如果保存的文件没有数据，则需要这句话。否则，不需要
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static int dateTimeTransfer(String date) {

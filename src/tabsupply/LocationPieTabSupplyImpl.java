@@ -1,27 +1,57 @@
 package tabsupply;
 
 import data.Data;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import javafx.util.Duration;
 import service.DataService;
 import service.ServiceFactory;
 import serviceimplements.HighDataServiceImpl;
 
+import javax.imageio.ImageIO;
+import java.io.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static tabsupply.StandTabSupplyTool.getSelectionsBox;
 
 public class LocationPieTabSupplyImpl extends AbstractTabSupplyImpl {
+    @Override
+    protected Consumer<Void> getBeforeAction() {
+        return beforeAction;
+    }
+
+    @Override
+    protected Consumer<Void> getAfterAllAction() {
+        return after;
+    }
+
+    private Consumer<Void> beforeAction;
+    private Consumer<Void> after;
+
+    @Override
+    protected Tab tabGenerate() {
+        return super.tabGenerate();
+    }
 
     private static final Supplier<Integer> cntSupplier = new Supplier<Integer>() {
         int number = 1;
@@ -34,15 +64,6 @@ public class LocationPieTabSupplyImpl extends AbstractTabSupplyImpl {
 
     final DataService service = new HighDataServiceImpl();
 
-    @Override
-    protected Consumer<Void> getBeforeAction() {
-        return null;
-    }
-
-    @Override
-    protected Consumer<Void> getAfterAllAction() {
-        return null;
-    }
 
     private String showProperty;
 
@@ -107,6 +128,8 @@ public class LocationPieTabSupplyImpl extends AbstractTabSupplyImpl {
 
                 //  创建一下相关的图的信息吧 qwq
                 pieChart.setData(dataMap.get(LocationPieTabSupplyImpl.this.showProperty));
+
+                waitTwoSeconds.play();
             });
         }
         {
@@ -115,8 +138,44 @@ public class LocationPieTabSupplyImpl extends AbstractTabSupplyImpl {
         }
         searchPane.getChildren().addAll(radioButtons);
 
+        {
+            waitTwoSeconds = new Timeline(new KeyFrame(Duration.seconds(2),
+                    event -> writableImage = pieChart.snapshot(new SnapshotParameters(), null)));
+            waitTwoSeconds.setCycleCount(1);
+        }
+
         radioButtons.get(0).fire();
 
+        //文件导出
+        beforeAction = v -> {
+            factory.getMenuBarService()
+                    .setExportOnAction(e -> exportAction());
+        };
+        after = v -> factory.getMenuBarService().setExportOnAction(null);
+
         return ans;
+    }
+
+    private Timeline waitTwoSeconds;
+
+    WritableImage writableImage;
+
+    private void exportAction() {
+        File file = StandTabSupplyTool.getChooseFile(new FileChooser(), "LocationPieChart",
+                new FileChooser.ExtensionFilter("image", "*.png"));
+
+        if (file == null) return;
+
+        try {
+            ImageIO.write(SwingFXUtils.fromFXImage(writableImage, null), "png", file);
+        } catch (Exception s) {
+            s.printStackTrace();
+        }
+
+        try {
+            file.createNewFile();//如果保存的文件没有数据，则需要这句话。否则，不需要
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

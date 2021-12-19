@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.*;
 
-public class CovidTableTabSupplyImpl extends AbstractTabSupplyImpl {
+public class OtherTableDataImpl extends AbstractTabSupplyImpl {
     @Override
     protected Consumer<Void> getBeforeAction() {
         return beforeAction;
@@ -57,38 +57,17 @@ public class CovidTableTabSupplyImpl extends AbstractTabSupplyImpl {
         }
     };
 
-    private static TableView<Tmp> initTableView(List<String> colNames, List<Data> datas) {
-        TableView<Tmp> view = new TableView<>();
-        view.setTableMenuButtonVisible(true);
 
-        final ToIntFunction<String> widthSupplier = str -> 80;
-
-        final Function<String, TableColumn<Tmp, String>> colGenerator =
-                s -> {
-                    final TableColumn<Tmp, String> col = new TableColumn<>(s);
-                    col.setCellValueFactory(new PropertyValueFactory<>(s));
-                    col.setPrefWidth(widthSupplier.applyAsInt(s));
-                    return col;
-                };
-        colNames.forEach(cn -> view.getColumns().add(colGenerator.apply(Tool.transferReverse(cn))));
-
-        ObservableList<Tmp> dataList = FXCollections.observableArrayList();
-        datas.stream().map(Tool::createRow).forEach(dataList::add);
-        view.setItems(dataList);
-        return view;
-    }
-
-    final DataService service = new NormalDataServiceImpl();
 
 
     @Override
     public Tab supply(ServiceFactory factory) {
         // 初始化一个标签页
         Tab ans = super.supply(factory);
-        ans.setText("Covid Table " + cntSupplier.get());
+        ans.setText("Other Covid Confirm Table " + cntSupplier.get());
 
         // 设置该标签页的提示信息
-        ans.setTooltip(new Tooltip("疫情信息表"));
+        ans.setTooltip(new Tooltip("其他疫情信息表"));
 
         // 设置该标签页内部的页面框架。
         BorderPane viewPane = new BorderPane();
@@ -149,7 +128,6 @@ public class CovidTableTabSupplyImpl extends AbstractTabSupplyImpl {
             searchField.setOnAction(e -> searchAction.accept(searchField.getText()));
             searchConfirmButton.setOnAction(e -> searchAction.accept(searchField.getText()));
 
-            //todo: 还想不到好的GUI设计，暂时这样呈现，有点点丑
             DatePicker datePicker = new DatePicker(LocalDate.now());
             datePicker.setEditable(false);
             searchBox.getChildren().add(datePicker);
@@ -169,40 +147,7 @@ public class CovidTableTabSupplyImpl extends AbstractTabSupplyImpl {
 
         // 创建表的相关操作
         {
-            @SuppressWarnings("unchecked")
-            TableView<Tmp> tableRowTableView = initTableView(service.getColumnNames(), service.getDataList());
-            viewPane.setCenter(tableRowTableView);
-            // 稍稍设置一下相关的图形参数吧，让它好看点
-            tableRowTableView.setPadding(new Insets(20));
-
-            // 设置搜索会发生的事情
-            @SuppressWarnings("unchecked") final List<Data> rows = service.getDataList();
-
-            searchBoxActionHolder.obj = (searchText) -> {
-                ObservableList<Tmp> searchList = FXCollections.observableArrayList();
-
-                rows.stream().filter(d -> {
-                    if (d.fetch("location").contains(searchText))
-                        return true;
-                    if (d.fetch("iso code").startsWith(searchText))
-                        return true;
-                    if (d.fetch("date").equals(searchText))
-                        return true;
-                    return false;
-                }).map(Tool::createRow).forEach(searchList::add);
-
-                tableRowTableView.setItems(searchList);
-
-                dataFilter = d -> {
-                    if (d.fetch("location").contains(searchText))
-                        return true;
-                    if (d.fetch("iso code").startsWith(searchText))
-                        return true;
-                    if (d.fetch("date").equals(searchText))
-                        return true;
-                    return false;
-                };
-            };
+            //todo
 
         }
 
@@ -219,7 +164,6 @@ public class CovidTableTabSupplyImpl extends AbstractTabSupplyImpl {
 
     }
 
-    private Predicate<Data> dataFilter = d -> true;
 
     private void exportAction() {
         File file = StandTabSupplyTool.getChooseFile(new FileChooser(), "CovidTable",
@@ -229,7 +173,7 @@ public class CovidTableTabSupplyImpl extends AbstractTabSupplyImpl {
         if (file == null) return;
 
         try (PrintStream writer = new PrintStream(new BufferedOutputStream(new FileOutputStream(file)))) {
-            service.toStringStream(dataFilter).forEach(writer::println);
+            //todo
         } catch (IOException e) {
             e.printStackTrace();
         }
