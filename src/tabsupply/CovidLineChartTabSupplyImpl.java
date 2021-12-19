@@ -225,7 +225,7 @@ public class CovidLineChartTabSupplyImpl extends AbstractTabSupplyImpl{
         return ans;
     }
 
-    private static int dateTimeTransfer(String date) {
+    public static int dateTimeTransfer(String date) {
         char[] chars = date.toCharArray();
         int year = 0;
         int month = -1;
