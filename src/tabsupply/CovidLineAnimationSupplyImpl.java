@@ -107,7 +107,7 @@ public class CovidLineAnimationSupplyImpl extends AbstractTabSupplyImpl {
             ScrollPane locationScrollPane = new ScrollPane();
             mainPane.setLeft(locationScrollPane);
 
-            VBox locationsBox = new VBox();
+            VBox locationsBox = StandTabSupplyTool.getSelectionsBox();
             locationScrollPane.setContent(locationsBox);
 
             Map<String, List<Data>> dateMap = service.getDataList().stream().collect(Collectors.groupingBy(d -> d.fetch("date")));
@@ -135,6 +135,7 @@ public class CovidLineAnimationSupplyImpl extends AbstractTabSupplyImpl {
 
             propertiesButtons.forEach(b -> b.setOnAction(e -> {
                 propertyName = b.getText();
+                animation.stop();
                 rollbar.setValue(minimum);
                 animation.play();
             }));

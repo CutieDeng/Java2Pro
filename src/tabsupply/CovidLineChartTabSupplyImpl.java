@@ -1,6 +1,8 @@
 package tabsupply;
 
 import data.Data;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -8,13 +10,14 @@ import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.Group;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.image.WritableImage;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
+import javafx.util.Duration;
 import service.DataService;
 import service.ServiceFactory;
 import serviceimplements.NormalDataServiceImpl;
@@ -23,6 +26,7 @@ import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.IntSupplier;
 import java.util.stream.Collectors;
@@ -135,7 +139,6 @@ public class CovidLineChartTabSupplyImpl extends AbstractTabSupplyImpl{
                     pane.setLeft(scrollPane);
 
                     VBox locationBoxes = getSelectionsBox();
-
                     scrollPane.setContent(locationBoxes);
 
                     List<String> locations = service.getDataList().stream().map(d -> d.fetch("location")).distinct()
@@ -179,13 +182,60 @@ public class CovidLineChartTabSupplyImpl extends AbstractTabSupplyImpl{
 
                     locationBoxes.getChildren().addAll(radioButtons);
 
+                    BorderPane bottomPane = new BorderPane();
+                    graphRelatedPane.setBottom(bottomPane);
+
                     ScrollBar scrollBar = new ScrollBar();
-                    graphRelatedPane.setBottom(scrollBar);
+                    bottomPane.setCenter(scrollBar);
 
                     scrollBar.setMin(minimum-1.);
                     scrollBar.setMax(maximum+1.);
 
                     scrollBar.setValue(minimum);
+
+                    AtomicInteger movePace = new AtomicInteger(1);
+
+                    Timeline timeline = new Timeline(new KeyFrame(Duration.millis(100.), new EventHandler<ActionEvent>() {
+                        @Override
+                        public void handle(ActionEvent event) {
+                            scrollBar.setValue(scrollBar.getValue() + movePace.get());
+                        }
+                    }));
+                    timeline.setAutoReverse(false);
+                    timeline.setCycleCount(maximum - minimum + 2);
+
+                    GridPane buttonsPane = new GridPane();
+                    Button back = new Button("快退");
+                    Button stop = new Button("暂停");
+                    Button forward = new Button("播放");
+                    Button fastForward = new Button("快进");
+
+                    buttonsPane.add(back, 0, 0);
+                    buttonsPane.add(stop, 1, 0);
+                    buttonsPane.add(forward, 2, 0);
+                    buttonsPane.add(fastForward, 3, 0);
+
+                    bottomPane.setRight(buttonsPane);
+
+                    {
+                        back.setOnAction(event -> {
+                            timeline.stop();
+                            movePace.set(-1);
+                            timeline.play();
+                        });
+                        stop.setOnAction(event -> timeline.stop());
+                        forward.setOnAction(event -> {
+                            timeline.stop();
+                            movePace.set(1);
+                            timeline.play();
+                        });
+                        fastForward.setOnAction(event -> {
+                            timeline.stop();
+                            movePace.set(2);
+                            timeline.play();
+                        });
+                    }
+
 
                     dateList.stream().filter(d -> {
                         double tmp = dateTimeTransfer(d) - scrollBar.getValue();
